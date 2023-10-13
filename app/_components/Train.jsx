@@ -5,7 +5,7 @@ import {
   CubicBezierLine, CurveModifier, MotionPathControls, Box, useMotion,
   QuadraticBezierLine,
 } from '@react-three/drei';
-import { path } from '../_utils/path';
+import { path } from '../_utils/trackBuilder.tsx';
 import Car from './Car';
 
 /*
@@ -36,7 +36,8 @@ export default function Cart(props) {
 
   function getOffsetProgress(updatedProgress, offset) {
     const fullAmount = 1; // add full amount to avoid problems with js modulus and negative numbers
-    return (updatedProgress + offset + fullAmount) % 1;
+    const offsetAsDistance = 30 * 1 / trackLength * offset;
+    return (updatedProgress + offsetAsDistance + fullAmount) % 1;
   }
 
   function updatePosition(itemRef, updatedProgress, offset = 0) {
