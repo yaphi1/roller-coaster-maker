@@ -1,4 +1,3 @@
-// @ts-ignore-error
 import * as THREE from 'three';
 
 type XYZ = {
@@ -11,8 +10,10 @@ type PieceType = 'straight' | 'right' | 'left' | 'up' | 'down';
 type TurnDirection = 'right' | 'left';
 type RampDirection = 'up' | 'down';
 
+type Path = THREE.LineCurve3 | THREE.QuadraticBezierCurve3;
+
 type Piece = {
-  path: any;
+  path: Path;
   nextDirection: XYZ;
   endPoint: XYZ;
 };
