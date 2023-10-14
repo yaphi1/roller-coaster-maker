@@ -10,20 +10,24 @@ import Car from './Car';
 
 /*
 TODO:
-  - add cars to coaster
-  - make track pieces
-  - make velocity change based on changes in vertical position
+  - improve car graphics
+  - make track visuals
+  - add user controls
+  - add scenery
+  - decide on camera
+  - add shareable url params for tracks
 */
 
 export default function Train(props) {
-  const carRef = useRef();
-  const carRef2 = useRef();
-  const carRef3 = useRef();
+  const carCount = 5;
+  const spaceBetweenCarts = 0.04;
+
+  const carRefs = (new Array(carCount)).fill().map(ref => useRef());
   const lineRef = useRef();
   const [progress, setProgress] = useState(0);
-  // const [direction, setDirection] = useState(new THREE.Vector3(1, 0, 0));
-  const speed = 10;
+  const [speed, setSpeed] = useState(10);
 
+  const trainMidpoint = (carRefs.length / 2) - 0.5;
   const trackLength = useMemo(() => {
     return path.getLength();
   }, []);
@@ -53,17 +57,28 @@ export default function Train(props) {
     itemRef.current.lookAt(cartCenter.add(tangent));
   }
 
+  function updateSpeed(updatedProgress, path) {
+    const verticalChange = path.getTangent(updatedProgress).y;
+    const minSpeed = 3;
+    const verticalDrag = verticalChange * 0.5;
+    const horizontalDrag = 0.01;
+    const newSpeed = Math.max(speed - verticalDrag - horizontalDrag, minSpeed);
+    setSpeed(newSpeed);
+  }
+
   function updateCar(itemRef, updatedProgress, offset, path) {
     updatePosition(itemRef, updatedProgress, offset);
     updateRotation(itemRef, updatedProgress, offset, path);
+    updateSpeed(updatedProgress, path);
   }
 
   useFrame((state, delta) => {
     const updatedProgress = getUpdatedProgress(delta);
 
-    updateCar(carRef, updatedProgress, 0, path);
-    updateCar(carRef2, updatedProgress, -0.04, path);
-    updateCar(carRef3, updatedProgress, -0.08, path);
+    carRefs.forEach((ref, i) => {
+      const offset = spaceBetweenCarts * (i - trainMidpoint);
+      updateCar(ref, updatedProgress, offset, path);
+    });
 
     setProgress(updatedProgress);
   });
@@ -73,9 +88,9 @@ export default function Train(props) {
   }, []);
   return (
     <>
-      <Car carRef={carRef} />
-      <Car carRef={carRef2} />
-      <Car carRef={carRef3} />
+      {carRefs.map((ref, i) => {
+        return (<Car carRef={ref} key={i} />);
+      })}
 
       <line ref={lineRef}>
         <bufferGeometry />

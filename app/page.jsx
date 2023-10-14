@@ -6,14 +6,18 @@ import Experience from './_components/Experience';
 const cameraSettings = {
   fov: 45,
   near: 0.1,
-  far: 200,
-  position: [-8, 6, 12],
+  far: 1000,
+  position: [-20, 15, 30],
+  // zoom: 100,
 };
 
 export default function Home() {
   return (
     <main className="h-screen">
-      <Canvas camera={cameraSettings}>
+      <Canvas
+        camera={cameraSettings}
+        // orthographic
+      >
         <Experience />
       </Canvas>
     </main>

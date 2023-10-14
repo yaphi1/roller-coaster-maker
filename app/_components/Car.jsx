@@ -10,6 +10,17 @@ export default function Car({ carRef }) {
 function CarModel() {
   return (
     <group>
+      <mesh position-y={0.25}>
+        <boxGeometry args={[1, 0.5, 1]} />
+        <meshStandardMaterial color="lightgreen" />
+      </mesh>
+    </group>
+  );
+}
+
+function CarModelDebugVersion() {
+  return (
+    <group>
       <mesh>
         <boxGeometry />
         <meshStandardMaterial color="lightgreen" />
