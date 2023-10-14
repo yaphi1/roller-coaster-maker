@@ -15,7 +15,7 @@ TODO:
   - make velocity change based on changes in vertical position
 */
 
-export default function Cart(props) {
+export default function Train(props) {
   const carRef = useRef();
   const carRef2 = useRef();
   const carRef3 = useRef();
