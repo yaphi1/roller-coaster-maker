@@ -16,6 +16,7 @@ type Piece = {
   path: Path;
   nextDirection: XYZ;
   endPoint: XYZ;
+  trackPieceVisual?: () => JSX.Element;
 };
 
 const straightAwayLength = 4;
@@ -72,11 +73,44 @@ function buildStraightPiece(startPoint: XYZ, direction: XYZ): Piece {
     new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z)
   );
 
+  const trackPieceVisual = buildStraightPieceVisual(path, direction);
+
   return {
     path,
     nextDirection: direction,
     endPoint,
+    trackPieceVisual,
   };
+}
+
+function buildStraightPieceVisual(path: Path, direction: XYZ) {
+  const tubularSegments = 1;
+  const radius = 0.1;
+  const radialSegments = 8;
+  const railOffset = 0.5;
+
+  const isMovingOnXAxis = direction.x !== 0;
+
+  const firstRailPosition = new THREE.Vector3(
+    ...(isMovingOnXAxis ? [0, 0, -railOffset] : [-railOffset, 0, 0])
+  );
+  const secondRailPosition = new THREE.Vector3(
+    ...(isMovingOnXAxis ? [0, 0, railOffset] : [railOffset, 0, 0])
+  );
+
+  const Rail = ({ position }: { position: THREE.Vector3 }) => (
+    <mesh position={position}>
+      <tubeGeometry args={[path, tubularSegments, radius, radialSegments]} />
+      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+    </mesh>
+  );
+
+  return () => (
+    <group>
+      <Rail position={firstRailPosition} />
+      <Rail position={secondRailPosition} />
+    </group>
+  );
 }
 
 function getNextDirection(direction: XYZ, turnDirection: TurnDirection): XYZ {
@@ -130,16 +164,20 @@ function assemblePieces(pieceTypes: PieceType[]) {
   let direction = { x: 1, y: 0, z: 0 };
 
   const path = new THREE.CurvePath();
+  const visuals: ((() => JSX.Element) | undefined)[] = [];
 
   pieceTypes.forEach(pieceType => {
     const piece = buildPiece(pieceType, startPoint, direction);
     path.add(piece.path);
     startPoint = piece.endPoint;
     direction = piece.nextDirection;
+
+    visuals.push(piece.trackPieceVisual);
   });
 
   return {
     path,
+    visuals,
   }
 }
 
@@ -186,5 +224,5 @@ function buildTrack() {
   ]);
 }
 
-const track = buildTrack();
+export const track = buildTrack();
 export const path = track.path;
