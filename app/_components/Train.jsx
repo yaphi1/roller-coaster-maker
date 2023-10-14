@@ -22,7 +22,7 @@ export default function Cart(props) {
   const lineRef = useRef();
   const [progress, setProgress] = useState(0);
   // const [direction, setDirection] = useState(new THREE.Vector3(1, 0, 0));
-  const speed = 2.5;
+  const speed = 10;
 
   const trackLength = useMemo(() => {
     return path.getLength();
