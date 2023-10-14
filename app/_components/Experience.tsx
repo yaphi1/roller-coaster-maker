@@ -11,6 +11,7 @@ export default function Experience() {
       <gridHelper />
 
       <Train />
+      <Train carCount={3} startingProgress={0.5} />
     </>
   );
 }

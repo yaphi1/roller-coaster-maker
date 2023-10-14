@@ -18,13 +18,15 @@ TODO:
   - add shareable url params for tracks
 */
 
-export default function Train(props) {
-  const carCount = 5;
-  const spaceBetweenCarts = 0.04;
+export default function Train({
+  carCount = 5,
+  spaceBetweenCarts = 1.2,
+  startingProgress = 0,
+}) {
 
   const carRefs = (new Array(carCount)).fill().map(ref => useRef());
   const lineRef = useRef();
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
 
   const trainMidpoint = (carRefs.length / 2) - 0.5;
@@ -39,9 +41,9 @@ export default function Train(props) {
   }
 
   function getOffsetProgress(updatedProgress, offset) {
-    const fullAmount = 1; // add full amount to avoid problems with js modulus and negative numbers
-    const offsetAsDistance = 30 * 1 / trackLength * offset;
-    return (updatedProgress + offsetAsDistance + fullAmount) % 1;
+    const maxProgress = 1; // add full amount to avoid problems with js modulus and negative numbers
+    const offsetAsFractionOfWholeTrack = offset / trackLength;
+    return (updatedProgress + offsetAsFractionOfWholeTrack + maxProgress) % 1;
   }
 
   function updatePosition(itemRef, updatedProgress, offset = 0) {
