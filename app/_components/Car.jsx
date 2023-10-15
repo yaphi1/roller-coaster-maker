@@ -1,3 +1,4 @@
+import { globalSettings } from "../_utils/globalSettings";
 
 export default function Car({ carRef }) {
   return (
@@ -12,7 +13,7 @@ function CarModel() {
     <group>
       <mesh position-y={0.25}>
         <boxGeometry args={[1, 0.5, 1]} />
-        <meshStandardMaterial color="lightgreen" />
+        <meshStandardMaterial color="#0088cb" wireframe={globalSettings.isDebugMode} />
       </mesh>
     </group>
   );

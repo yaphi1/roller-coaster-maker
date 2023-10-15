@@ -11,6 +11,7 @@ import {
   TrackPath,
 } from './types';
 import premadeTrack from '../_premadeTracks/01_two_hills';
+import { globalSettings } from './globalSettings';
 
 const straightawayLength = 4;
 const trackPieceDepth = 0.1;
@@ -132,7 +133,7 @@ function buildTrackPieceVisual(path: Path) {
     return (
       <mesh key={i}>
         <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
-        <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="red" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
       </mesh>
     );
   });
@@ -140,7 +141,7 @@ function buildTrackPieceVisual(path: Path) {
   const middleRail = (
     <mesh>
       <tubeGeometry args={[middleRailPath, tubularSegments, 0.15, radialSegments]} />
-      <meshStandardMaterial color="white" side={THREE.DoubleSide} />
+      <meshStandardMaterial color="white" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
     </mesh>
   );
 
@@ -148,7 +149,7 @@ function buildTrackPieceVisual(path: Path) {
     return (
       <mesh key={i}>
         <tubeGeometry args={[crossPiecePath, tubularSegments, 0.05, radialSegments]} />
-        <meshStandardMaterial color="white" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="white" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
       </mesh>
     );
   });
@@ -260,7 +261,7 @@ function buildTrackSupports(trackPath: TrackPath, supportPaths: THREE.LineCurve3
     return () => isValid ? (
       <mesh key={i}>
         <tubeGeometry args={[supportPath, tubularSegments, radius, radialSegments]} />
-        <meshStandardMaterial color="black" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="black" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
       </mesh>
     ) : (<></>);
   });
@@ -309,9 +310,15 @@ function buildPiece(pieceType: PieceType, startPoint: XYZ, direction: XYZ) {
   else { return buildStraightPiece(startPoint, direction); }
 }
 
-function buildTrack(pieceTypes: PieceType[]): Track {
-  let startPoint = { x: 0, y: 0, z: 0 };
-  let direction = { x: 1, y: 0, z: 0 };
+function buildTrack({
+  startPoint = { x: 0, y: 0.3, z: 0 },
+  direction = { x: 1, y: 0, z: 0 },
+  pieceTypes
+} : {
+  startPoint?: XYZ,
+  direction?: XYZ,
+  pieceTypes: PieceType[],
+}): Track {
 
   const trackPath: TrackPath = new THREE.CurvePath();
   const visuals: PathVisual[] = [];
@@ -336,4 +343,4 @@ function buildTrack(pieceTypes: PieceType[]): Track {
   }
 }
 
-export const track = buildTrack(premadeTrack);
+export const track = buildTrack({ pieceTypes: premadeTrack });
