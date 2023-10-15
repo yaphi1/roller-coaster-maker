@@ -120,35 +120,87 @@ function buildTrackPieceVisual(path: Path) {
   const radialSegments = 8;
 
   const railPaths = getRailPaths(path);
+  const middleRailPath = getMiddleRailPath(path);
+  const crossPiecePaths = getCrossPiecePaths({ path, depth: 0.1, horizontalReach: 0.5 });
+
+  const sideRails = railPaths.map((railPath, i) => {
+    return (
+      <mesh key={i}>
+        <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
+        <meshStandardMaterial color="red" side={THREE.DoubleSide} />
+      </mesh>
+    );
+  });
+
+  const middleRail = (
+    <mesh>
+      <tubeGeometry args={[middleRailPath, tubularSegments, 0.15, radialSegments]} />
+      <meshStandardMaterial color="white" side={THREE.DoubleSide} />
+    </mesh>
+  );
+
+  const crossPieces = crossPiecePaths.map((crossPiecePath, i) => {
+    return (
+      <mesh key={i}>
+        <tubeGeometry args={[crossPiecePath, tubularSegments, 0.05, radialSegments]} />
+        <meshStandardMaterial color="white" side={THREE.DoubleSide} />
+      </mesh>
+    );
+  });
 
   return () => (
     <group>
-      {railPaths.map((railPath, i) => {
-        return (
-          <mesh key={i}>
-            <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
-            <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-          </mesh>
-        );
-      })}
+      {sideRails}
+      {middleRail}
+      {crossPieces}
     </group>
   );
 }
 
-function getRailPaths(path: Path) {
-  const trackOffset = 0.5;
+function getRailPaths(path: Path, horizontalOffset = 0.5) {
+  const firstRailPoints = getPointsOffsetFromPath(path, horizontalOffset);
+  const secondRailPoints = getPointsOffsetFromPath(path, -horizontalOffset);
 
-  const firstTrackPoints = getPointsOffsetFromPath(path, trackOffset);
-  const secondTrackPoints = getPointsOffsetFromPath(path, -trackOffset);
+  const firstRailPath = new THREE.CatmullRomCurve3(firstRailPoints);
+  const secondRailPath = new THREE.CatmullRomCurve3(secondRailPoints);
 
-  const firstTrackPath = new THREE.CatmullRomCurve3(firstTrackPoints);
-  const secondTrackPath = new THREE.CatmullRomCurve3(secondTrackPoints);
-
-  return [ firstTrackPath, secondTrackPath ];
+  return [ firstRailPath, secondRailPath ];
 }
 
-function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertical = 0, pointsCount = 10) {
-  const points = path.getPoints(pointsCount);
+function getMiddleRailPath(path: Path, verticalOffset = -0.2) {
+  const horizontalOffset = 0;
+  const railPoints = getPointsOffsetFromPath(path, horizontalOffset, verticalOffset);
+  const railPath = new THREE.CatmullRomCurve3(railPoints);
+
+  return railPath;
+}
+
+function getCrossPiecePaths(
+  { path, depth, horizontalReach } :
+  { path: Path, depth: number, horizontalReach: number }
+) {
+  const firstRailPoints = getPointsOffsetFromPath(path, horizontalReach);
+  const secondRailPoints = getPointsOffsetFromPath(path, -horizontalReach);
+  const centerRailPoints = getPointsOffsetFromPath(path, 0, -depth);
+
+  const crossPiecePaths = centerRailPoints.map((centerRailPoint, i) => {
+    const firstLine = new THREE.LineCurve3(firstRailPoints[i], centerRailPoint);
+    const secondLine = new THREE.LineCurve3(centerRailPoint, secondRailPoints[i]);
+    const crossPiecePath: THREE.CurvePath<THREE.Vector3> = new THREE.CurvePath();
+
+    crossPiecePath.add(firstLine);
+    crossPiecePath.add(secondLine);
+
+    return crossPiecePath;
+  });
+
+  return crossPiecePaths;
+}
+
+function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertical = 0) {
+  const desiredSegmentLength = straightawayLength * 0.25;
+  const pointsCount = Math.ceil(path.getLength() / desiredSegmentLength);
+  const points = path.getSpacedPoints(pointsCount);
 
   // For each of n points along the curve a Frenet Frame gives:
   //   - the tangent (direction)
