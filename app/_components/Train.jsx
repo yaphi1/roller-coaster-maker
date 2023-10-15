@@ -16,6 +16,7 @@ TODO:
   - add scenery
   - decide on camera
   - add shareable url params for tracks
+  - check about using clock to regulate speed. it gets out of control when leaving the tab
 */
 
 export default function Train({
