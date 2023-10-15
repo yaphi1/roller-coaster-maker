@@ -6,6 +6,9 @@ import {
   RampDirection,
   Path,
   Piece,
+  PathVisual,
+  Track,
+  TrackPath,
 } from './types';
 import premadeTrack from '../_premadeTracks/01_two_hills';
 
@@ -184,12 +187,12 @@ function buildPiece(pieceType: PieceType, startPoint: XYZ, direction: XYZ) {
   else { return buildStraightPiece(startPoint, direction); }
 }
 
-function assemblePieces(pieceTypes: PieceType[]) {
+function buildTrack(pieceTypes: PieceType[]): Track {
   let startPoint = { x: 0, y: 0, z: 0 };
   let direction = { x: 1, y: 0, z: 0 };
 
-  const path = new THREE.CurvePath();
-  const visuals: ((() => JSX.Element) | undefined)[] = [];
+  const path: TrackPath = new THREE.CurvePath();
+  const visuals: PathVisual[] = [];
 
   pieceTypes.forEach(pieceType => {
     const piece = buildPiece(pieceType, startPoint, direction);
@@ -206,5 +209,5 @@ function assemblePieces(pieceTypes: PieceType[]) {
   }
 }
 
-export const track = assemblePieces(premadeTrack);
-export const path = track.path;
+export const track = buildTrack(premadeTrack);
+export const debugPath = track.path;

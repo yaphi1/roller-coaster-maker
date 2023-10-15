@@ -1,12 +1,7 @@
-import * as THREE from 'three';
-import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import {
-  CubicBezierLine, CurveModifier, MotionPathControls, Box, useMotion,
-  QuadraticBezierLine,
-} from '@react-three/drei';
-import { path } from '../_utils/trackBuilder.tsx';
+import { useFrame } from "@react-three/fiber";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import Car from './Car';
+import { globalSettings } from "../_utils/globalSettings";
 
 /*
 TODO:
@@ -24,13 +19,13 @@ const gravityStrength = 0.5;
 const horizontalDrag = 0.02;
 
 export default function Train({
+  path,
   carCount = 5,
   spaceBetweenCarts = 1.2,
   startingProgress = 0,
 }) {
 
   const carRefs = (new Array(carCount)).fill().map(ref => useRef());
-  const lineRef = useRef();
   const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
 
@@ -88,19 +83,11 @@ export default function Train({
     setProgress(updatedProgress);
   });
 
-  useLayoutEffect(() => {
-    lineRef.current.geometry.setFromPoints(path.getPoints());
-  }, []);
   return (
     <>
       {carRefs.map((ref, i) => {
         return (<Car carRef={ref} key={i} />);
       })}
-
-      <line ref={lineRef}>
-        <bufferGeometry />
-        <lineBasicMaterial color="red" />
-      </line>
     </>
   );
 }

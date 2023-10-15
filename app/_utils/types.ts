@@ -16,3 +16,12 @@ export type Piece = {
   endPoint: XYZ;
   trackPieceVisual: () => JSX.Element;
 };
+
+export type PathVisual = ((() => JSX.Element) | undefined);
+
+export type TrackPath = THREE.CurvePath<THREE.Vector3>;
+
+export type Track = {
+  path: TrackPath;
+  visuals: PathVisual[];
+};
