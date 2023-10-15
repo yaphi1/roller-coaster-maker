@@ -337,4 +337,3 @@ function buildTrack(pieceTypes: PieceType[]): Track {
 }
 
 export const track = buildTrack(premadeTrack);
-export const debugPath = track.path;

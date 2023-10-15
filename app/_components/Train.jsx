@@ -1,12 +1,10 @@
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Car from './Car';
-import { globalSettings } from "../_utils/globalSettings";
 
 /*
 TODO:
   - improve car graphics
-  - make track visuals
   - add user controls
   - add scenery
   - decide on camera
