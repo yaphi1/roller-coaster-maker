@@ -193,7 +193,7 @@ function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDire
     nextDirection,
   };
 
-  const trackPieceVisual = buildTurnPieceVisual(turnPoints, path);
+  const trackPieceVisual = buildTurnPieceVisual(path);
 
   return {
     path,
@@ -203,70 +203,19 @@ function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDire
   };
 }
 
-// function buildTurnPieceVisual(path: Path, direction: XYZ) {
-function buildTurnPieceVisual(turnPoints: TurnPoints, path: Path) {
-  const { start,  end,  control,  direction,  nextDirection } = turnPoints;
+function buildTurnPieceVisual(path: Path) {
   const tubularSegments = 20;
   const radius = 0.1;
   const radialSegments = 8;
-  const railOffset = 0.5;
 
-  const isMovingOnXAxis = direction.x !== 0;
-
-  const firstRailPosition = new THREE.Vector3(
-    ...(isMovingOnXAxis ? [0, 0, -railOffset] : [-railOffset, 0, 0])
-  );
-  const secondRailPosition = new THREE.Vector3(
-    ...(isMovingOnXAxis ? [0, 0, railOffset] : [railOffset, 0, 0])
-  );
-
-  /*
-  try getting the curve points and adjusting the start, end, and offset
-
-  if x direction is zero:
-    - add railOffset * 0 to the z coord
-    - if z direction is negative:
-      - add railOffset to the x coord
-
-  instead of this whole rigamarole, what if I get perpendicular vectors and generate path points from that?
-    - first, get points along center path
-    - for each point, find plus (or minus) the track offset amount in the perpendicular direction to the tangent
-    - using those points, make a new curve (and repeat for minus)
-
-  */
-  const smallPath = new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(start.x + railOffset, start.y, start.z),
-    new THREE.Vector3(control.x + railOffset, control.y, control.z + railOffset),
-    new THREE.Vector3(end.x, end.y, end.z + railOffset)
-  );
-
-  const betterPaths = getRailPaths(path);
-  const SmallRail = () => (
-    <mesh>
-      <tubeGeometry args={[betterPaths[0], tubularSegments, radius, radialSegments]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-    </mesh>
-  );
-
-  // const geometry = new THREE.BoxGeometry( 3, 3, 3 );
-  const tubePath = new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(start.x, start.y, start.z),
-    new THREE.Vector3(control.x, control.y, control.z),
-    new THREE.Vector3(end.x, end.y, end.z)
-  );
-  const geometry = new THREE.TubeGeometry( tubePath, 10, 1, 4 );
-  const edges = new THREE.EdgesGeometry( geometry );
-
-  // const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 'green' } ) );
-
-  getRailPaths(path);
+  const railPaths = getRailPaths(path);
 
   return () => (
     <group>
-      {betterPaths.map((betterPath, i) => {
+      {railPaths.map((railPath, i) => {
         return (
           <mesh key={i}>
-            <tubeGeometry args={[betterPath, tubularSegments, radius, radialSegments]} />
+            <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
             <meshStandardMaterial color="red" side={THREE.DoubleSide} />
           </mesh>
         );
@@ -275,13 +224,6 @@ function buildTurnPieceVisual(turnPoints: TurnPoints, path: Path) {
   );
 }
 
-
-/*
-let's try it
-    - first, get points along center path
-    - for each point, find plus (or minus) the track offset amount in the perpendicular direction to the tangent
-    - using those points, make a new curve (and repeat for minus)
-*/
 function getRailPaths(path: Path) {
   const trackOffset = 0.5;
 
@@ -294,7 +236,7 @@ function getRailPaths(path: Path) {
   return [ firstTrackPath, secondTrackPath ];
 }
 
-function getPointsOffsetFromPath(path: Path, offset = 1, pointsCount = 10) {
+function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertical = 0, pointsCount = 10) {
   const points = path.getPoints(pointsCount);
 
   // For each of n points along the curve a Frenet Frame gives:
@@ -303,12 +245,15 @@ function getPointsOffsetFromPath(path: Path, offset = 1, pointsCount = 10) {
   //   - the binormal (horizontal perpendicular)
   const frenetFrames = path.computeFrenetFrames(pointsCount);
   const horizontalPerpendiculars = frenetFrames.binormals;
+  const verticalPerpendiculars = frenetFrames.normals;
 
   const offsetPoints = points.map((point, i) => {
     const pointCopy = new THREE.Vector3().copy(point);
-    const perpendicularCopy = new THREE.Vector3().copy(horizontalPerpendiculars[i]);
-    const newPointOffset = perpendicularCopy.multiplyScalar(offset);
-    const newPoint = pointCopy.add(newPointOffset);
+    const horizontalPerpendicular = new THREE.Vector3().copy(horizontalPerpendiculars[i]);
+    const verticalPerpendicular = new THREE.Vector3().copy(verticalPerpendiculars[i]);
+    const newPointOffsetHorizontal = horizontalPerpendicular.multiplyScalar(offsetHorizontal);
+    const newPointOffsetVertical = verticalPerpendicular.multiplyScalar(-offsetVertical);
+    const newPoint = pointCopy.add(newPointOffsetHorizontal).add(newPointOffsetVertical);
 
     return newPoint;
   });
