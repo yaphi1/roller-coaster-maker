@@ -19,6 +19,10 @@ TODO:
   - check about using clock to regulate speed. it gets out of control when leaving the tab
 */
 
+const minSpeed = 3;
+const gravityStrength = 0.5;
+const horizontalDrag = 0.02;
+
 export default function Train({
   carCount = 5,
   spaceBetweenCarts = 1.2,
@@ -62,9 +66,7 @@ export default function Train({
 
   function updateSpeed(updatedProgress, path) {
     const verticalChange = path.getTangent(updatedProgress).y;
-    const minSpeed = 3;
-    const verticalDrag = verticalChange * 0.5;
-    const horizontalDrag = 0.01;
+    const verticalDrag = verticalChange * gravityStrength;
     const newSpeed = Math.max(speed - verticalDrag - horizontalDrag, minSpeed);
     setSpeed(newSpeed);
   }
