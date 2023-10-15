@@ -1,23 +1,13 @@
 import * as THREE from 'three';
-
-type XYZ = {
-  x: number;
-  y: number;
-  z: number;
-};
-
-type PieceType = 'straight' | 'right' | 'left' | 'up' | 'down';
-type TurnDirection = 'right' | 'left';
-type RampDirection = 'up' | 'down';
-
-type Path = THREE.LineCurve3 | THREE.QuadraticBezierCurve3 | THREE.CatmullRomCurve3;
-
-type Piece = {
-  path: Path;
-  nextDirection: XYZ;
-  endPoint: XYZ;
-  trackPieceVisual: () => JSX.Element;
-};
+import {
+  XYZ,
+  PieceType,
+  TurnDirection,
+  RampDirection,
+  Path,
+  Piece,
+} from './types';
+import premadeTrack from '../_premadeTracks/01_two_hills';
 
 const straightawayLength = 4;
 
@@ -216,48 +206,5 @@ function assemblePieces(pieceTypes: PieceType[]) {
   }
 }
 
-function buildTrack() {
-  return assemblePieces([
-    'straight',
-    'straight',
-    'right',
-    'left',
-    'left',
-    'straight',
-    'straight',
-    'left',
-    'straight',
-    'straight',
-    'left',
-    'up',
-    'straight',
-    'down',
-    'down',
-    'straight',
-    'up',
-    'straight',
-    'straight',
-    'left',
-    'left',
-    'straight',
-    'straight',
-    'straight',
-    'left',
-    'straight',
-    'straight',
-    'up',
-    'down',
-    'down',
-    'up',
-    'right',
-    'straight',
-    'right',
-    'straight',
-    'straight',
-    'straight',
-    'straight',
-  ]);
-}
-
-export const track = buildTrack();
+export const track = assemblePieces(premadeTrack);
 export const path = track.path;
