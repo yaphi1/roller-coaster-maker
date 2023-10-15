@@ -13,6 +13,8 @@ import {
 import premadeTrack from '../_premadeTracks/01_two_hills';
 
 const straightawayLength = 4;
+const trackPieceDepth = 0.1;
+const desiredLengthBetweenPathPoints = straightawayLength * 0.25;
 
 function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDirection): Piece {
   const { x, y, z } = startPoint;
@@ -52,6 +54,7 @@ function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDire
     nextDirection,
     endPoint,
     trackPieceVisual: buildTrackPieceVisual(path),
+    supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
 }
 
@@ -72,6 +75,7 @@ function buildStraightPiece(startPoint: XYZ, direction: XYZ): Piece {
     nextDirection: direction,
     endPoint,
     trackPieceVisual: buildTrackPieceVisual(path),
+    supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
 }
 
@@ -111,6 +115,7 @@ function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDire
     nextDirection,
     endPoint,
     trackPieceVisual: buildTrackPieceVisual(path),
+    supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
 }
 
@@ -121,7 +126,7 @@ function buildTrackPieceVisual(path: Path) {
 
   const railPaths = getRailPaths(path);
   const middleRailPath = getMiddleRailPath(path);
-  const crossPiecePaths = getCrossPiecePaths({ path, depth: 0.1, horizontalReach: 0.5 });
+  const crossPiecePaths = getCrossPiecePaths({ path, depth: trackPieceDepth, horizontalReach: 0.5 });
 
   const sideRails = railPaths.map((railPath, i) => {
     return (
@@ -197,9 +202,74 @@ function getCrossPiecePaths(
   return crossPiecePaths;
 }
 
+function getSupportPolePaths(
+  { path, depthOfTopPoint } :
+  { path: Path, depthOfTopPoint: number }
+) {
+  const centerRailPoints = getPointsOffsetFromPath(path, 0, -depthOfTopPoint);
+
+  const supportPolePaths = centerRailPoints.map((centerRailPoint, i) => {
+    const groundPoint = new THREE.Vector3(...[
+      centerRailPoint.x,
+      0 - depthOfTopPoint,
+      centerRailPoint.z,
+    ]);
+    const polePath = new THREE.LineCurve3(centerRailPoint, groundPoint);
+
+    return polePath;
+  });
+
+  return supportPolePaths;
+}
+
+function isValidSupport(supportPath: THREE.LineCurve3, trackPathPoints: THREE.Vector3[]) {
+  const range = 1;
+  const verticalClearance = 1;
+  const topOfSupportPole = supportPath.v1;
+
+  for (const trackPathPoint of trackPathPoints) {
+    const { x: trackX, y: trackY, z: trackZ } = trackPathPoint;
+    const { x: poleX, y: poleY, z: poleZ } = topOfSupportPole;
+
+    const isTrackLowerThanPole = trackY <= poleY - verticalClearance;
+
+    const isTrackInRangeOfPoleX = (poleX - range <= trackX) && (trackX <= poleX + range);
+    const isTrackInRangeOfPoleZ = (poleZ - range <= trackZ) && (trackZ <= poleZ + range);
+    const isTrackNearPole = isTrackInRangeOfPoleX && isTrackInRangeOfPoleZ;
+    const isPoleOverlappingTrack = isTrackNearPole && isTrackLowerThanPole;
+
+    if (isPoleOverlappingTrack) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function buildTrackSupports(trackPath: TrackPath, supportPaths: THREE.LineCurve3[]): PathVisual[] {
+  const tubularSegments = 20;
+  const radius = 0.1;
+  const radialSegments = 8;
+
+  const trackPathPointCount = Math.ceil(trackPath.getLength() / desiredLengthBetweenPathPoints);
+  const trackPathPoints = trackPath.getSpacedPoints(trackPathPointCount);
+
+  const supports = supportPaths.map((supportPath, i) => {
+    const isValid = isValidSupport(supportPath, trackPathPoints);
+
+    return () => isValid ? (
+      <mesh key={i}>
+        <tubeGeometry args={[supportPath, tubularSegments, radius, radialSegments]} />
+        <meshStandardMaterial color="black" side={THREE.DoubleSide} />
+      </mesh>
+    ) : (<></>);
+  });
+
+  return supports;
+}
+
 function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertical = 0) {
-  const desiredSegmentLength = straightawayLength * 0.25;
-  const pointsCount = Math.ceil(path.getLength() / desiredSegmentLength);
+  const pointsCount = Math.ceil(path.getLength() / desiredLengthBetweenPathPoints);
   const points = path.getSpacedPoints(pointsCount);
 
   // For each of n points along the curve a Frenet Frame gives:
@@ -243,20 +313,25 @@ function buildTrack(pieceTypes: PieceType[]): Track {
   let startPoint = { x: 0, y: 0, z: 0 };
   let direction = { x: 1, y: 0, z: 0 };
 
-  const path: TrackPath = new THREE.CurvePath();
+  const trackPath: TrackPath = new THREE.CurvePath();
   const visuals: PathVisual[] = [];
+  const supportPaths: THREE.LineCurve3[] = [];
 
   pieceTypes.forEach(pieceType => {
     const piece = buildPiece(pieceType, startPoint, direction);
-    path.add(piece.path);
+    trackPath.add(piece.path);
     startPoint = piece.endPoint;
     direction = piece.nextDirection;
 
     visuals.push(piece.trackPieceVisual);
+    supportPaths.push(...piece.supportPaths);
   });
 
+  const trackSupports = buildTrackSupports(trackPath, supportPaths);
+  visuals.push(...trackSupports);
+
   return {
-    path,
+    path: trackPath,
     visuals,
   }
 }

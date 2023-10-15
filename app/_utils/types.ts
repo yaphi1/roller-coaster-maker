@@ -15,6 +15,7 @@ export type Piece = {
   nextDirection: XYZ;
   endPoint: XYZ;
   trackPieceVisual: () => JSX.Element;
+  supportPaths: THREE.LineCurve3[];
 };
 
 export type PathVisual = ((() => JSX.Element) | undefined);
