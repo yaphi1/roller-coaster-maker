@@ -19,15 +19,7 @@ type Piece = {
   trackPieceVisual: () => JSX.Element;
 };
 
-type TurnPoints = {
-  start: XYZ;
-  end: XYZ;
-  control: XYZ;
-  direction: XYZ;
-  nextDirection: XYZ;
-};
-
-const straightAwayLength = 4;
+const straightawayLength = 4;
 
 function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDirection): Piece {
   const { x, y, z } = startPoint;
@@ -38,17 +30,17 @@ function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDire
     z: direction.z,
   };
 
-  const elevationChangeMagnitude = straightAwayLength * 0.5;
+  const elevationChangeMagnitude = straightawayLength * 0.5;
   const elevationChangeDirection = direction.y === 0 ? nextDirection.y : direction.y;
   const elevationChange = elevationChangeDirection * elevationChangeMagnitude;
 
   const endPoint = {
-    x: x + direction.x * straightAwayLength,
+    x: x + direction.x * straightawayLength,
     y: y + elevationChange,
-    z: z + direction.z * straightAwayLength,
+    z: z + direction.z * straightawayLength,
   };
 
-  const controlPointDistanceFromStart = straightAwayLength * 0.5;
+  const controlPointDistanceFromStart = straightawayLength * 0.5;
 
   const controlPoint = {
     x: x + direction.x * controlPointDistanceFromStart,
@@ -62,96 +54,32 @@ function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDire
     new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z)
   );
 
-  const trackPieceVisual = buildRampPieceVisual(path, direction);
-
   return {
     path,
     nextDirection,
     endPoint,
-    trackPieceVisual,
+    trackPieceVisual: buildTrackPieceVisual(path),
   };
-}
-
-function buildRampPieceVisual(path: Path, direction: XYZ) {
-  const tubularSegments = 20;
-  const radius = 0.1;
-  const radialSegments = 8;
-  const railOffset = 0.5;
-
-  const isMovingOnXAxis = direction.x !== 0;
-
-  const firstRailPosition = new THREE.Vector3(
-    ...(isMovingOnXAxis ? [0, 0, -railOffset] : [-railOffset, 0, 0])
-  );
-  const secondRailPosition = new THREE.Vector3(
-    ...(isMovingOnXAxis ? [0, 0, railOffset] : [railOffset, 0, 0])
-  );
-
-  const Rail = ({ position }: { position: THREE.Vector3 }) => (
-    <mesh position={position}>
-      <tubeGeometry args={[path, tubularSegments, radius, radialSegments]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-    </mesh>
-  );
-
-  return () => (
-    <group>
-      <Rail position={firstRailPosition} />
-      <Rail position={secondRailPosition} />
-    </group>
-  );
 }
 
 function buildStraightPiece(startPoint: XYZ, direction: XYZ): Piece {
   const { x, y, z } = startPoint;
   const endPoint = {
-    x: x + direction.x * straightAwayLength,
-    y: y + direction.y * straightAwayLength,
-    z: z + direction.z * straightAwayLength,
+    x: x + direction.x * straightawayLength,
+    y: y + direction.y * straightawayLength,
+    z: z + direction.z * straightawayLength,
   };
   const path = new THREE.LineCurve3(
     new THREE.Vector3(x, y, z),
     new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z)
   );
 
-  const trackPieceVisual = buildStraightPieceVisual(path, direction);
-
   return {
     path,
     nextDirection: direction,
     endPoint,
-    trackPieceVisual,
+    trackPieceVisual: buildTrackPieceVisual(path),
   };
-}
-
-function buildStraightPieceVisual(path: Path, direction: XYZ) {
-  const tubularSegments = 1;
-  const radius = 0.1;
-  const radialSegments = 8;
-  const railOffset = 0.5;
-
-  const isMovingOnXAxis = direction.x !== 0;
-
-  const firstRailPosition = new THREE.Vector3(
-    ...(isMovingOnXAxis ? [0, 0, -railOffset] : [-railOffset, 0, 0])
-  );
-  const secondRailPosition = new THREE.Vector3(
-    ...(isMovingOnXAxis ? [0, 0, railOffset] : [railOffset, 0, 0])
-  );
-
-  const Rail = ({ position }: { position: THREE.Vector3 }) => (
-    <mesh position={position}>
-      <tubeGeometry args={[path, tubularSegments, radius, radialSegments]} />
-      <meshStandardMaterial color="red" side={THREE.DoubleSide} />
-    </mesh>
-  );
-
-  return () => (
-    <group>
-      <Rail position={firstRailPosition} />
-      <Rail position={secondRailPosition} />
-    </group>
-  );
 }
 
 function getNextDirection(direction: XYZ, turnDirection: TurnDirection): XYZ {
@@ -166,17 +94,17 @@ function getNextDirection(direction: XYZ, turnDirection: TurnDirection): XYZ {
 function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDirection): Piece {
   const { x, y, z } = startPoint;
   const controlPoint = {
-    x: x + direction.x * straightAwayLength,
-    y: y + direction.y * straightAwayLength,
-    z: z + direction.z * straightAwayLength,
+    x: x + direction.x * straightawayLength,
+    y: y + direction.y * straightawayLength,
+    z: z + direction.z * straightawayLength,
   };
 
   const nextDirection = getNextDirection(direction, turnDirection);
   
   const endPoint = {
-    x: controlPoint.x + nextDirection.x * straightAwayLength,
-    y: controlPoint.y + nextDirection.y * straightAwayLength,
-    z: controlPoint.z + nextDirection.z * straightAwayLength,
+    x: controlPoint.x + nextDirection.x * straightawayLength,
+    y: controlPoint.y + nextDirection.y * straightawayLength,
+    z: controlPoint.z + nextDirection.z * straightawayLength,
   };
 
   const path = new THREE.QuadraticBezierCurve3(
@@ -185,25 +113,15 @@ function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDire
     new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z)
   );
 
-  const turnPoints = {
-    start: startPoint,
-    end: endPoint,
-    control: controlPoint,
-    direction,
-    nextDirection,
-  };
-
-  const trackPieceVisual = buildTurnPieceVisual(path);
-
   return {
     path,
     nextDirection,
     endPoint,
-    trackPieceVisual,
+    trackPieceVisual: buildTrackPieceVisual(path),
   };
 }
 
-function buildTurnPieceVisual(path: Path) {
+function buildTrackPieceVisual(path: Path) {
   const tubularSegments = 20;
   const radius = 0.1;
   const radialSegments = 8;
@@ -241,18 +159,25 @@ function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertica
 
   // For each of n points along the curve a Frenet Frame gives:
   //   - the tangent (direction)
-  //   - the normal (vertical perpendicular)
-  //   - the binormal (horizontal perpendicular)
+  //   - the normal and binormal (perpendiculars)
   const frenetFrames = path.computeFrenetFrames(pointsCount);
-  const horizontalPerpendiculars = frenetFrames.binormals;
-  const verticalPerpendiculars = frenetFrames.normals;
+
+  const isBinormalHorizontal = frenetFrames.binormals[0].y === 0;
+  const isVerticalOffsetReversed = frenetFrames.binormals[0].y < 0 || frenetFrames.normals[0].y < 0;
+
+  const horizontalVectors = isBinormalHorizontal ? 'binormals' : 'normals';
+  const verticalVectors = !isBinormalHorizontal ? 'binormals' : 'normals';
+
+  const horizontalPerpendiculars = frenetFrames[horizontalVectors];
+  const verticalPerpendiculars = frenetFrames[verticalVectors];
+  const offsetVerticalCorrected = isVerticalOffsetReversed ? -offsetVertical : offsetVertical;
 
   const offsetPoints = points.map((point, i) => {
     const pointCopy = new THREE.Vector3().copy(point);
     const horizontalPerpendicular = new THREE.Vector3().copy(horizontalPerpendiculars[i]);
     const verticalPerpendicular = new THREE.Vector3().copy(verticalPerpendiculars[i]);
     const newPointOffsetHorizontal = horizontalPerpendicular.multiplyScalar(offsetHorizontal);
-    const newPointOffsetVertical = verticalPerpendicular.multiplyScalar(-offsetVertical);
+    const newPointOffsetVertical = verticalPerpendicular.multiplyScalar(offsetVerticalCorrected);
     const newPoint = pointCopy.add(newPointOffsetHorizontal).add(newPointOffsetVertical);
 
     return newPoint;
