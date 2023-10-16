@@ -29,3 +29,9 @@ export type Track = {
   visuals: PathVisual[];
   pieces: Piece[],
 };
+
+export type CollisionZone = {
+  x: { min: number; max: number; };
+  y: { min: number; max: number; };
+  z: { min: number; max: number; };
+};

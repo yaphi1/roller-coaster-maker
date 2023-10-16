@@ -12,9 +12,12 @@ import {
 } from './types';
 import { globalSettings } from './globalSettings';
 
-const straightawayLength = 4;
+export const straightawayLength = 4;
+export const trackWidth = 1;
 const trackPieceDepth = 0.1;
-const desiredLengthBetweenPathPoints = straightawayLength * 0.25;
+export const desiredPointsPerTrackPiece = 5;
+const spacesBetweenTrackPiecePoints = desiredPointsPerTrackPiece - 1;
+const desiredLengthBetweenPathPoints = straightawayLength / spacesBetweenTrackPiecePoints;
 
 function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDirection): Piece {
   const { x, y, z } = startPoint;
@@ -168,7 +171,7 @@ function buildTrackPieceVisual(path: Path) {
   );
 }
 
-function getRailPaths(path: Path, horizontalOffset = 0.5) {
+function getRailPaths(path: Path, horizontalOffset = trackWidth / 2) {
   const firstRailPoints = getPointsOffsetFromPath(path, horizontalOffset);
   const secondRailPoints = getPointsOffsetFromPath(path, -horizontalOffset);
 
@@ -252,13 +255,18 @@ function isValidSupport(supportPath: THREE.LineCurve3, trackPathPoints: THREE.Ve
   return true;
 }
 
+export function getTrackPathPoints(trackPath: TrackPath) {
+  const trackPathPointCount = Math.ceil(trackPath.getLength() / desiredLengthBetweenPathPoints);
+  const trackPathPoints = trackPath.getSpacedPoints(trackPathPointCount);
+  return trackPathPoints
+}
+
 function buildTrackSupports(trackPath: TrackPath, supportPaths: THREE.LineCurve3[]): PathVisual[] {
   const tubularSegments = 20;
   const radius = 0.1;
   const radialSegments = 8;
 
-  const trackPathPointCount = Math.ceil(trackPath.getLength() / desiredLengthBetweenPathPoints);
-  const trackPathPoints = trackPath.getSpacedPoints(trackPathPointCount);
+  const trackPathPoints = getTrackPathPoints(trackPath);
 
   const supports = supportPaths.map((supportPath, i) => {
     const isValid = isValidSupport(supportPath, trackPathPoints);
@@ -308,7 +316,7 @@ function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offsetVertica
   return offsetPoints;
 }
 
-function buildPiece(pieceType: PieceType, startPoint: XYZ, direction: XYZ) {
+export function buildPiece(pieceType: PieceType, startPoint: XYZ, direction: XYZ) {
   if (pieceType === 'left') { return buildTurnPiece(startPoint, direction, 'left'); }
   else if (pieceType === 'right') { return buildTurnPiece(startPoint, direction, 'right'); }
   else if (pieceType === 'up') { return buildRampPiece(startPoint, direction, 'up'); }

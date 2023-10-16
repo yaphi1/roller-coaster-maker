@@ -1,15 +1,27 @@
 # TODO:
   - improve car graphics
-  - add user controls
-  - add scenery
-  - decide on camera
+  - add scenery and textures
+  - add clickable presets
   - add shareable url params for tracks
-  - allow multiple coasters
-  - add camera controls
-  - add collision checks during track building
+  - decide on camera: type, constraints, and controls
   - bgm & sfx
+  - undo/redo
   - add loop-the-loops
+  - allow multiple coasters
   - add play/pause per coaster
+  - allow color changes
+
+
+
+
+
+
+
+
+
+
+## Discarded todos with reasons why (so I don't do them again)
+
   - consider doing rendering for track rather than per piece
     - this would allow more ambitious curves because the Frenet-Serret frames would be correct like with the coaster train
     - update: I tried it and there are problems
