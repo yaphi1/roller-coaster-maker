@@ -284,16 +284,11 @@ function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offsetVertica
   const frenetFrames = path.computeFrenetFrames(pointsCount);
 
   const isBinormalHorizontal = Math.abs(frenetFrames.binormals[0].y) < 0.001; // close enough to zero to avoid rounding errors
-  const isVerticalOffsetReversed = frenetFrames.binormals[0].y < 0 || frenetFrames.normals[0].y < 0;
-
-  const isCurve = path.constructor.name === 'QuadraticBezierCurve3';
-  if (isCurve) {
-    console.log({ isBinormalHorizontal });
-    console.log({ 'frenetFrames.binormals[0].y' : frenetFrames.binormals[0].y });
-  }
 
   const horizontalVectors = isBinormalHorizontal ? 'binormals' : 'normals';
   const verticalVectors = !isBinormalHorizontal ? 'binormals' : 'normals';
+
+  const isVerticalOffsetReversed = frenetFrames[verticalVectors][0].y < 0;
 
   const horizontalPerpendiculars = frenetFrames[horizontalVectors];
   const verticalPerpendiculars = frenetFrames[verticalVectors];
