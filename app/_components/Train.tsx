@@ -4,15 +4,6 @@ import Car from './Car';
 import { Group } from "three";
 import { TrackPath } from "../_utils/types";
 
-/*
-TODO:
-  - improve car graphics
-  - add user controls
-  - add scenery
-  - decide on camera
-  - add shareable url params for tracks
-*/
-
 const minSpeed = 3;
 const gravityStrength = 0.5;
 const horizontalDrag = 0.02;

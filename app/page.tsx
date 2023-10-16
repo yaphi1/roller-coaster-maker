@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import Experience from './_components/Experience';
+import Controls from './_components/Controls';
 
 const cameraSettings = {
   fov: 45,
@@ -21,6 +22,7 @@ export default function Home() {
       >
         <Experience />
       </Canvas>
+      <Controls />
     </main>
   )
 }
