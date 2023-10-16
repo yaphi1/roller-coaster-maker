@@ -274,7 +274,7 @@ function buildTrackSupports(trackPath: TrackPath, supportPaths: THREE.LineCurve3
   return supports;
 }
 
-function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertical = 0) {
+function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offsetVertical = 0) {
   const pointsCount = Math.ceil(path.getLength() / desiredLengthBetweenPathPoints);
   const points = path.getSpacedPoints(pointsCount);
 
