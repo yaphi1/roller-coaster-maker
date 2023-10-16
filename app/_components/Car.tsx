@@ -1,6 +1,9 @@
+import { RefObject } from "react";
 import { globalSettings } from "../_utils/globalSettings";
+import { Group } from "three";
 
-export default function Car({ carRef }) {
+// export default function Car({ carRef }: { carRef: Ref<Group> }) {
+export default function Car({ carRef }: { carRef: RefObject<Group> }) {
   return (
     <group ref={carRef}>
       <CarModel />

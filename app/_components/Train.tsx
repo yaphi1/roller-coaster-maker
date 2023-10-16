@@ -1,6 +1,8 @@
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { RefObject, useMemo, useRef, useState } from "react";
 import Car from './Car';
+import { Group } from "three";
+import { TrackPath } from "../_utils/types";
 
 /*
 TODO:
@@ -21,9 +23,14 @@ export default function Train({
   carCount = 5,
   spaceBetweenCarts = 1.2,
   startingProgress = 0,
+}: {
+  path: TrackPath,
+  carCount?: number,
+  spaceBetweenCarts?: number,
+  startingProgress?: number,
 }) {
 
-  const carRefs = (new Array(carCount)).fill().map(ref => useRef());
+  const carRefs = (new Array(carCount)).fill(null).map(ref => useRef<Group>(null));
   const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
 
@@ -32,39 +39,41 @@ export default function Train({
     return path.getLength();
   }, []);
 
-  function getUpdatedProgress(delta) {
+  function getUpdatedProgress(delta: number) {
     const distanceTraveledThisIncrement = speed * (1 / trackLength) * delta;
     const updatedProgress = (progress + distanceTraveledThisIncrement) % 1;
     return updatedProgress;
   }
 
-  function getOffsetProgress(updatedProgress, offset) {
+  function getOffsetProgress(updatedProgress: number, offset: number) {
     const maxProgress = 1; // add full amount to avoid problems with js modulus and negative numbers
     const offsetAsFractionOfWholeTrack = offset / trackLength;
     return (updatedProgress + offsetAsFractionOfWholeTrack + maxProgress) % 1;
   }
 
-  function updatePosition(itemRef, updatedProgress, offset = 0) {
+  function updatePosition(itemRef: RefObject<Group>, updatedProgress: number, offset = 0) {
+    if (!itemRef?.current) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
     itemRef.current.position.copy(path.getPoint(offsetProgress));
   }
   
-  function updateRotation(itemRef, updatedProgress, offset = 0, path) {
+  function updateRotation(itemRef: RefObject<Group>, updatedProgress: number, offset = 0, path: TrackPath) {
+    if (!itemRef.current) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
     const tangent = path.getTangent(offsetProgress);
 
-    window.cartCenter = itemRef.current.position.clone();
+    const cartCenter = itemRef.current.position.clone();
     itemRef.current.lookAt(cartCenter.add(tangent));
   }
 
-  function updateSpeed(updatedProgress, path) {
+  function updateSpeed(updatedProgress: number, path: TrackPath) {
     const verticalChange = path.getTangent(updatedProgress).y;
     const verticalDrag = verticalChange * gravityStrength;
     const newSpeed = Math.max(speed - verticalDrag - horizontalDrag, minSpeed);
     setSpeed(newSpeed);
   }
 
-  function updateCar(itemRef, updatedProgress, offset, path) {
+  function updateCar(itemRef: RefObject<Group>, updatedProgress: number, offset: number, path: TrackPath) {
     updatePosition(itemRef, updatedProgress, offset);
     updateRotation(itemRef, updatedProgress, offset, path);
     updateSpeed(updatedProgress, path);

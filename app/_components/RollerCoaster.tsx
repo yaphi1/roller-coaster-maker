@@ -12,7 +12,7 @@ export default function RollerCoaster({ track }: { track: Track }) {
       })}
 
       <Train path={track.path} />
-      {/* <Train carCount={3} startingProgress={0.5} /> */}
+      <Train path={track.path} carCount={3} startingProgress={0.5} />
 
       {globalSettings.isDebugMode && <PathDebugger path={track.path} />}
     </>
