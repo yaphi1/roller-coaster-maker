@@ -7,3 +7,9 @@
   - add scenery
   - decide on camera
   - add shareable url params for tracks
+  - allow multiple coasters
+  - add camera controls
+  - add collision checks during track building
+  - bgm & sfx
+  - add loop-the-loops
+  - add play/pause per coaster

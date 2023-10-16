@@ -71,12 +71,13 @@ export default function Train({
 
   useFrame((state, delta) => {
     // Why cleanDelta instead of delta?
-    //   When tab loses focus, animation callbacks may be throttled or paused
+    //   When tab loses focus, animation callbacks may be throttled or paused.
     //   When going back to the tab, delta might be huge!
-    //   That gap throws off the position and speed since they build on previous info.
-    //   For this reason, we'll hardcode an approximate delta of 0.06 to pick up roughly where we left off.
-    //   0.06 was chosen based on experimentation. Large enough to be useful but small enough to be safe.
-    const cleanDelta = Math.min(delta, 0.06);
+    //   As a result, the position changes a lot, but the speed stays the same because
+    //   the speed missed out on the cumulative buildup of moving to the new position.
+    //   For this reason, we'll hardcode an approximate delta of 0.033 to pick up roughly where we left off.
+    //   0.033 was chosen based to approximate a lower limit of 30fps
+    const cleanDelta = Math.min(delta, 0.033);
     const updatedProgress = getUpdatedProgress(cleanDelta);
 
     carRefs.forEach((ref, i) => {
