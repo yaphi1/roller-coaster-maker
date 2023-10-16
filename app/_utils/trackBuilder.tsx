@@ -351,7 +351,3 @@ export function buildTrack({
     pieces,
   }
 }
-
-export function getTrackPieceInfo({ pieceIndex, builtTrack }: { pieceIndex: number, builtTrack: Track }) {
-  return builtTrack.pieces[pieceIndex];
-}

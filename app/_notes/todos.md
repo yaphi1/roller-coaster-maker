@@ -1,7 +1,4 @@
 # TODO:
-  - make controls more intuitive
-    - disable unusable ones
-    - match how people think about the controls, not how my program thinks about them (especially up/down)
   - improve car graphics
   - add user controls
   - add scenery
@@ -18,4 +15,3 @@
     - update: I tried it and there are problems
       - The frenet frames are different than the coaster's orientation because the coaster uses lookAt with an up direction of y. As a result, we can get unwanted twists in our curves.
       - The rendering assumes all the track pieces are the same design. It doesn't allow for station pieces, for example.
-
