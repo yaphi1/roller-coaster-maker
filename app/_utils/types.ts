@@ -12,8 +12,10 @@ export type Path = THREE.LineCurve3 | THREE.QuadraticBezierCurve3 | THREE.Catmul
 
 export type Piece = {
   path: Path;
-  nextDirection: XYZ;
+  startPoint: XYZ;
   endPoint: XYZ;
+  direction: XYZ;
+  nextDirection: XYZ;
   trackPieceVisual: () => JSX.Element;
   supportPaths: THREE.LineCurve3[];
 };
@@ -25,4 +27,5 @@ export type TrackPath = THREE.CurvePath<THREE.Vector3>;
 export type Track = {
   path: TrackPath;
   visuals: PathVisual[];
+  pieces: Piece[],
 };

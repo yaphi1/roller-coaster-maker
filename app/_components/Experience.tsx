@@ -4,20 +4,11 @@ import RollerCoaster from './RollerCoaster';
 import { globalSettings } from '../_utils/globalSettings';
 import Ground from './Ground';
 import { useMemo } from 'react';
-import { PieceType, XYZ } from '../_utils/types';
+import { PieceType, Track, XYZ } from '../_utils/types';
 
-export default function Experience({ tracks }: {
-  tracks: {
-    startPoint: XYZ,
-    direction: XYZ,
-    pieceTypes: PieceType[]
-  }[],
+export default function Experience({ builtTracks }: {
+  builtTracks: Track[],
 }) {
-
-  const builtTracks = useMemo(() => {
-    return tracks.map(track => buildTrack(track));
-  }, [tracks]);
-
   return (
     <>
       <OrbitControls />

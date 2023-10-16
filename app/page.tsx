@@ -4,8 +4,9 @@ import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import Experience from './_components/Experience';
 import Controls from './_components/Controls';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import startingTrackPieces from './_premadeTracks/000_starter';
+import { buildTrack } from './_utils/trackBuilder';
 // import startingTrackPieces from './_premadeTracks/001_two_hills';
 
 const cameraSettings = {
@@ -29,15 +30,19 @@ export default function Home() {
     },
   ];
 
+  const builtTracks = useMemo(() => {
+    return tracks.map(track => buildTrack(track));
+  }, [trackPieces]);
+
   return (
     <main className="h-screen">
       <Canvas
         camera={cameraSettings}
         // orthographic
       >
-        <Experience tracks={tracks} />
+        <Experience builtTracks={builtTracks} />
       </Canvas>
-      <Controls trackPieces={trackPieces} setTrackPieces={setTrackPieces}/>
+      <Controls trackPieces={trackPieces} builtTracks={builtTracks} setTrackPieces={setTrackPieces}/>
     </main>
   )
 }

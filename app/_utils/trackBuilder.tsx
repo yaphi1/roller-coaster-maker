@@ -51,8 +51,10 @@ function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDire
 
   return {
     path,
-    nextDirection,
+    startPoint,
     endPoint,
+    direction,
+    nextDirection,
     trackPieceVisual: buildTrackPieceVisual(path),
     supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
@@ -72,8 +74,10 @@ function buildStraightPiece(startPoint: XYZ, direction: XYZ): Piece {
 
   return {
     path,
-    nextDirection: direction,
+    startPoint,
     endPoint,
+    direction,
+    nextDirection: direction,
     trackPieceVisual: buildTrackPieceVisual(path),
     supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
@@ -112,8 +116,10 @@ function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDire
 
   return {
     path,
-    nextDirection,
+    startPoint,
     endPoint,
+    direction,
+    nextDirection,
     trackPieceVisual: buildTrackPieceVisual(path),
     supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
@@ -277,8 +283,14 @@ function getPointsOffsetFromPath(path: Path, offsetHorizontal = 1, offsetVertica
   //   - the normal and binormal (perpendiculars)
   const frenetFrames = path.computeFrenetFrames(pointsCount);
 
-  const isBinormalHorizontal = frenetFrames.binormals[0].y === 0;
+  const isBinormalHorizontal = frenetFrames.binormals[0].y < 0.001; // close enough to zero to avoid rounding errors
   const isVerticalOffsetReversed = frenetFrames.binormals[0].y < 0 || frenetFrames.normals[0].y < 0;
+
+  const isCurve = path.constructor.name === 'QuadraticBezierCurve3';
+  if (isCurve) {
+    console.log({ isBinormalHorizontal });
+    console.log({ 'frenetFrames.binormals[0].y' : frenetFrames.binormals[0].y });
+  }
 
   const horizontalVectors = isBinormalHorizontal ? 'binormals' : 'normals';
   const verticalVectors = !isBinormalHorizontal ? 'binormals' : 'normals';
@@ -322,9 +334,11 @@ export function buildTrack({
   const trackPath: TrackPath = new THREE.CurvePath();
   const visuals: PathVisual[] = [];
   const supportPaths: THREE.LineCurve3[] = [];
+  const pieces: Piece[] = [];
 
   pieceTypes.forEach(pieceType => {
     const piece = buildPiece(pieceType, startPoint, direction);
+    pieces.push(piece);
     trackPath.add(piece.path);
     startPoint = piece.endPoint;
     direction = piece.nextDirection;
@@ -339,5 +353,10 @@ export function buildTrack({
   return {
     path: trackPath,
     visuals,
+    pieces,
   }
+}
+
+export function getTrackPieceInfo({ pieceIndex, builtTrack }: { pieceIndex: number, builtTrack: Track }) {
+  return builtTrack.pieces[pieceIndex];
 }

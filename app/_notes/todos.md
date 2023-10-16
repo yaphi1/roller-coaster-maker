@@ -13,3 +13,5 @@
   - bgm & sfx
   - add loop-the-loops
   - add play/pause per coaster
+  - consider doing rendering for track rather than per piece
+    - this would allow more ambitious curves because the Frenet-Serret frames would be correct like with the coaster train

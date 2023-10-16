@@ -11,3 +11,6 @@ Need to get tangent and perpendiculars to a wild, curved path?
   - References:
     - General info: https://en.wikipedia.org/wiki/Frenet%E2%80%93Serret_formulas
     - Using in THREE.js: https://threejs.org/docs/#api/en/extras/core/Curve.computeFrenetFrames
+
+With precise calculations remember to watch out for rounding errors
+  - A track orientation bug surfaced with this layout: L, R, R, S, L
