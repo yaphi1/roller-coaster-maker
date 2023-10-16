@@ -7,6 +7,7 @@ If importing THREE.js fails, remember to import three.js types via something lik
 
 Need to get tangent and perpendiculars to a wild, curved path?
   - `Frenet-Serret frames` are a lifesaver
+  - Especially useful for things like walls, rails, beams, and stripes along a curved path
   - References:
     - General info: https://en.wikipedia.org/wiki/Frenet%E2%80%93Serret_formulas
     - Using in THREE.js: https://threejs.org/docs/#api/en/extras/core/Curve.computeFrenetFrames

@@ -27,7 +27,7 @@ export default function Train({
   const trainMidpoint = (carRefs.length / 2) - 0.5;
   const trackLength = useMemo(() => {
     return path.getLength();
-  }, []);
+  }, [path]);
 
   function getUpdatedProgress(delta: number) {
     const distanceTraveledThisIncrement = speed * (1 / trackLength) * delta;

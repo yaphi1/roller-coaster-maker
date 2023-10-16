@@ -10,7 +10,6 @@ import {
   Track,
   TrackPath,
 } from './types';
-import premadeTrack from '../_premadeTracks/01_two_hills';
 import { globalSettings } from './globalSettings';
 
 const straightawayLength = 4;
@@ -310,7 +309,7 @@ function buildPiece(pieceType: PieceType, startPoint: XYZ, direction: XYZ) {
   else { return buildStraightPiece(startPoint, direction); }
 }
 
-function buildTrack({
+export function buildTrack({
   startPoint = { x: 0, y: 0.3, z: 0 },
   direction = { x: 1, y: 0, z: 0 },
   pieceTypes
@@ -342,5 +341,3 @@ function buildTrack({
     visuals,
   }
 }
-
-export const track = buildTrack({ pieceTypes: premadeTrack });

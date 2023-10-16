@@ -1,10 +1,23 @@
 import { OrbitControls } from '@react-three/drei';
-import { track } from '../_utils/trackBuilder';
+import { buildTrack } from '../_utils/trackBuilder';
 import RollerCoaster from './RollerCoaster';
 import { globalSettings } from '../_utils/globalSettings';
 import Ground from './Ground';
+import { useMemo } from 'react';
+import { PieceType, XYZ } from '../_utils/types';
 
-export default function Experience() {
+export default function Experience({ tracks }: {
+  tracks: {
+    startPoint: XYZ,
+    direction: XYZ,
+    pieceTypes: PieceType[]
+  }[],
+}) {
+
+  const builtTracks = useMemo(() => {
+    return tracks.map(track => buildTrack(track));
+  }, [tracks]);
+
   return (
     <>
       <OrbitControls />
@@ -14,7 +27,7 @@ export default function Experience() {
       {globalSettings.isDebugMode && <gridHelper args={[100, 100]} />}
 
       <Ground />
-      <RollerCoaster track={track} />
+      <RollerCoaster track={builtTracks[0]} />
     </>
   );
 }
