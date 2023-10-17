@@ -1,18 +1,17 @@
 import { OrbitControls } from '@react-three/drei';
-import { buildTrack } from '../_utils/trackBuilder';
 import RollerCoaster from './RollerCoaster';
 import { globalSettings } from '../_utils/globalSettings';
 import Ground from './Ground';
-import { useMemo } from 'react';
-import { PieceType, Track, XYZ } from '../_utils/types';
+import { Track, CameraType } from '../_utils/types';
 
-export default function Experience({ builtTracks }: {
+export default function Experience({ builtTracks, cameraType }: {
   builtTracks: Track[],
+  cameraType: CameraType,
 }) {
   return (
     <>
-      <OrbitControls />
-      <directionalLight position={[1,2,3]} intensity={1.5} />
+      {cameraType === 'orbital'  && <OrbitControls target={[20, 0, 0]} />}
+      <directionalLight position={[1, 2, 3]} intensity={1.5} />
       <ambientLight intensity={0.5} />
 
       {globalSettings.isDebugMode && <gridHelper args={[100, 100]} />}

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { CollisionZone, Piece, PieceType, Track, XYZ } from "../_utils/types";
+import { CameraType, CollisionZone, Piece, PieceType, Track, XYZ } from "../_utils/types";
 import { buildPiece, desiredPointsPerTrackPiece, getTrackPathPoints, trackWidth } from "../_utils/trackBuilder";
 
 function isPieceBlocked(pieceType: PieceType, builtTrack: Track) {
@@ -119,11 +119,12 @@ function isSloping(latestPiece: Piece) {
 }
 
 export default function Controls(
-  { trackPieces, setTrackPieces, builtTracks }:
+  { trackPieces, setTrackPieces, builtTracks, setCameraType }:
   {
     trackPieces: PieceType[],
     setTrackPieces: Dispatch<SetStateAction<PieceType[]>>,
     builtTracks: Track[],
+    setCameraType: Dispatch<SetStateAction<CameraType>>
   }
 ) {
   const builtTrack = builtTracks[0];
@@ -131,80 +132,110 @@ export default function Controls(
   const isMinTrackSize = trackPieces.length <= 3;
 
   return (
-    <div className="fixed z-10 left-0 bottom-0 bg-white/50 rounded-md p-2 m-2 text-slate-700">
-      <div className="font-bold mb-1">
-        Track Editor
+    <>
+      <div className="fixed z-10 left-0 bottom-0 bg-white/50 rounded-md p-2 m-2 text-slate-700">
+        <div className="font-bold mb-1">
+          Track Editor
+        </div>
+        <div className="flex gap-1">
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => {
+              let nextPiece: PieceType = 'straight';
+              if (isGoingDown(latestPiece)) { nextPiece = 'up'; }
+              if (isGoingUp(latestPiece)) { nextPiece = 'down'; }
+
+              setTrackPieces([...trackPieces, nextPiece]);
+            }}
+            disabled={isPieceBlocked('straight', builtTrack)}
+          >
+            Forward
+          </button>
+
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => {
+              const copyOfPieces = [...trackPieces];
+              copyOfPieces.pop();
+              setTrackPieces(copyOfPieces);
+            }}
+            disabled={isMinTrackSize}
+          >
+            Delete
+          </button>
+
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => { setTrackPieces([...trackPieces, 'left']); }}
+            disabled={isSloping(latestPiece) || isPieceBlocked('left', builtTrack)}
+          >
+            Left
+          </button>
+
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => { setTrackPieces([...trackPieces, 'right']); }}
+            disabled={isSloping(latestPiece) || isPieceBlocked('right', builtTrack)}
+          >
+            Right
+          </button>
+
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => {
+              const nextPiece = isGoingUp(latestPiece) ? 'straight' : 'up';
+              setTrackPieces([...trackPieces, nextPiece]);
+            }}
+            disabled={isPieceBlocked('up', builtTrack)}
+          >
+            Up
+          </button>
+
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => {
+              let nextPiece: PieceType = 'down';
+              if (isGoingDown(latestPiece)) {
+                nextPiece = isNearBottom(latestPiece) ? 'up' : 'straight';
+              }
+              setTrackPieces([...trackPieces, nextPiece]);
+            }}
+            disabled={isAtBottom(latestPiece) || isPieceBlocked('down', builtTrack)}
+          >
+            Down
+          </button>
+
+          {/* <button className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50">Play</button> */}
+        </div>
       </div>
-      <div className="flex gap-1">
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => {
-            let nextPiece: PieceType = 'straight';
-            if (isGoingDown(latestPiece)) { nextPiece = 'up'; }
-            if (isGoingUp(latestPiece)) { nextPiece = 'down'; }
 
-            setTrackPieces([...trackPieces, nextPiece]);
-          }}
-          disabled={isPieceBlocked('straight', builtTrack)}
-        >
-          Forward
-        </button>
-
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => {
-            const copyOfPieces = [...trackPieces];
-            copyOfPieces.pop();
-            setTrackPieces(copyOfPieces);
-          }}
-          disabled={isMinTrackSize}
-        >
-          Delete
-        </button>
-
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => { setTrackPieces([...trackPieces, 'left']); }}
-          disabled={isSloping(latestPiece) || isPieceBlocked('left', builtTrack)}
-        >
-          Left
-        </button>
-
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => { setTrackPieces([...trackPieces, 'right']); }}
-          disabled={isSloping(latestPiece) || isPieceBlocked('right', builtTrack)}
-        >
-          Right
-        </button>
-
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => {
-            const nextPiece = isGoingUp(latestPiece) ? 'straight' : 'up';
-            setTrackPieces([...trackPieces, nextPiece]);
-          }}
-          disabled={isPieceBlocked('up', builtTrack)}
-        >
-          Up
-        </button>
-
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => {
-            let nextPiece: PieceType = 'down';
-            if (isGoingDown(latestPiece)) {
-              nextPiece = isNearBottom(latestPiece) ? 'up' : 'straight';
-            }
-            setTrackPieces([...trackPieces, nextPiece]);
-          }}
-          disabled={isAtBottom(latestPiece) || isPieceBlocked('down', builtTrack)}
-        >
-          Down
-        </button>
-
-        {/* <button className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50">Play</button> */}
+      <div className="fixed z-10 right-0 bottom-0 bg-white/50 rounded-md p-2 m-2 text-slate-700">
+        <div className="font-bold mb-1">
+          Camera
+        </div>
+        <div className="flex gap-1">
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => { setCameraType('orbital') }}
+          >
+            Free
+          </button>
+          
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => { setCameraType('coasterFocus') }}
+          >
+            Focus
+          </button>
+          
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => { setCameraType('firstPerson') }}
+          >
+            Inside
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -35,3 +35,5 @@ export type CollisionZone = {
   y: { min: number; max: number; };
   z: { min: number; max: number; };
 };
+
+export type CameraType = 'orbital' | 'coasterFocus' | 'firstPerson';

@@ -1,28 +1,34 @@
 import * as THREE from 'three';
 import { globalSettings } from '../_utils/globalSettings';
 import { useThree } from '@react-three/fiber';
+import { useEffect, useMemo } from 'react';
 
 const textureLoader = new THREE.TextureLoader();
 
-const skyTexture = textureLoader.load('/textures/sky.jpg');
-skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-skyTexture.repeat.set(1, 1);
-skyTexture.wrapS = THREE.RepeatWrapping;
-skyTexture.wrapT = THREE.RepeatWrapping;
-
-// grass texture source: https://www.sketchuptextureclub.com/textures/nature-elements/vegetation/green-grass/artificial-green-grass-texture-seamless-13061
-const grass = textureLoader.load('/textures/grass.jpg');
-grass.repeat.set(500, 500);
-grass.wrapS = THREE.RepeatWrapping;
-grass.wrapT = THREE.RepeatWrapping;
-
 export default function Ground() {
+
+  const textures = useMemo(() => {
+    const skyTexture = textureLoader.load('/textures/sky.jpg');
+    const grassTexture = textureLoader.load('/textures/grass.jpg'); // grass texture source: https://www.sketchuptextureclub.com/textures/nature-elements/vegetation/green-grass/artificial-green-grass-texture-seamless-13061
+    return { skyTexture, grassTexture };
+  }, []);
+
+  useEffect(() => {
+    const { skyTexture, grassTexture } = textures;
+
+    skyTexture.mapping = THREE.EquirectangularReflectionMapping;
+
+    grassTexture.repeat.set(500, 500);
+    grassTexture.wrapS = THREE.RepeatWrapping;
+    grassTexture.wrapT = THREE.RepeatWrapping;
+  }, []);
+
   const { scene } = useThree();
-  scene.background = skyTexture;
+  scene.background = textures.skyTexture;
 
   const groundMaterial = globalSettings.isDebugMode ?
     <meshStandardMaterial color="white" /> :
-    <meshStandardMaterial map={grass} />
+    <meshStandardMaterial map={textures.grassTexture} />
   ;
 
   return (

@@ -1,14 +1,49 @@
-import { useFrame } from "@react-three/fiber";
-import { RefObject, useMemo, useRef, useState } from "react";
+import * as THREE from 'three';
+import { useFrame, useThree } from "@react-three/fiber";
+import { RefObject, useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
 import { Group } from "three";
-import { TrackPath } from "../_utils/types";
+import { CameraType, TrackPath } from "../_utils/types";
+import { CameraContext } from "../page";
 
 const stopForDebugging = false;
 
 const minSpeed = stopForDebugging ? 0 : 3;
 const gravityStrength = 0.5;
 const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
+
+function updateCamera(cameraType: CameraType | null, path: TrackPath, progress:number) {
+  const camera = useThree().camera;
+  if (!cameraType || cameraType === 'orbital') { return; }
+
+  const coasterPosition = path.getPointAt(progress);
+
+  if (cameraType === 'coasterFocus') {
+    const cameraPosition = new THREE.Vector3(
+      coasterPosition.x + 7,
+      coasterPosition.y + 10,
+      coasterPosition.z + 20,
+    );
+    camera.position.copy(cameraPosition);
+    camera.lookAt(coasterPosition);
+  }
+  
+  if (cameraType === 'firstPerson') {
+    const tangent = path.getTangentAt(progress);
+    const cameraPosition = new THREE.Vector3(
+      coasterPosition.x,
+      coasterPosition.y + 2,
+      coasterPosition.z,
+    );
+    const cameraDirection = new THREE.Vector3(
+      tangent.x,
+      tangent.y - 0.2,
+      tangent.z,
+    );
+    camera.position.copy(cameraPosition);
+    camera.lookAt(cameraPosition.add(cameraDirection));
+  }
+}
 
 export default function Train({
   path,
@@ -21,10 +56,12 @@ export default function Train({
   spaceBetweenCarts?: number,
   startingProgress?: number,
 }) {
-
   const carRefs = (new Array(carCount)).fill(null).map(ref => useRef<Group>(null));
   const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
+
+  const cameraType = useContext(CameraContext);
+  updateCamera(cameraType, path, progress);
 
   const trainMidpoint = (carRefs.length / 2) - 0.5;
   const trackLength = useMemo(() => {
@@ -46,20 +83,20 @@ export default function Train({
   function updatePosition(itemRef: RefObject<Group>, updatedProgress: number, offset = 0) {
     if (!itemRef?.current) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
-    itemRef.current.position.copy(path.getPoint(offsetProgress));
+    itemRef.current.position.copy(path.getPointAt(offsetProgress));
   }
   
   function updateRotation(itemRef: RefObject<Group>, updatedProgress: number, offset = 0, path: TrackPath) {
     if (!itemRef.current) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
-    const tangent = path.getTangent(offsetProgress);
+    const tangent = path.getTangentAt(offsetProgress);
 
     const cartCenter = itemRef.current.position.clone();
     itemRef.current.lookAt(cartCenter.add(tangent));
   }
 
   function updateSpeed(updatedProgress: number, path: TrackPath) {
-    const verticalChange = path.getTangent(updatedProgress).y;
+    const verticalChange = path.getTangentAt(updatedProgress).y;
     const verticalDrag = verticalChange * gravityStrength;
     const newSpeed = Math.max(speed - verticalDrag - horizontalDrag, minSpeed);
     setSpeed(newSpeed);
