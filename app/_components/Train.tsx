@@ -4,11 +4,11 @@ import Car from './Car';
 import { Group } from "three";
 import { TrackPath } from "../_utils/types";
 
-// const minSpeed = 3;
-const minSpeed = 0;
+const stopForDebugging = false;
+
+const minSpeed = stopForDebugging ? 0 : 3;
 const gravityStrength = 0.5;
-// const horizontalDrag = 0.02;
-const horizontalDrag = 0.22;
+const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
 
 export default function Train({
   path,

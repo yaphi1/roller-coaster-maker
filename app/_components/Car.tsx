@@ -64,6 +64,7 @@ function CarBody({ isFrontCar = false }) {
   const front = (<mesh position={[0, 0.45, 0.45]}><boxGeometry args={[1, 0.5, 0.1]} />{bodyMaterial}</mesh>);
   const left = (<mesh position={[0.45, 0.45, 0]}><boxGeometry args={[0.1, 0.5, 1]} />{bodyMaterial}</mesh>);
   const right = (<mesh position={[-0.45, 0.45, 0]}><boxGeometry args={[0.1, 0.5, 1]} />{bodyMaterial}</mesh>);
+  const connector = (<mesh position={[0, 0.35, 0.58]} rotation-x={Math.PI * 0.5}><cylinderGeometry args={[0.1, 0.1, 0.3]} />{darkMetalMaterial}</mesh>);
 
   return (
     <group>
@@ -72,6 +73,7 @@ function CarBody({ isFrontCar = false }) {
       {front}
       {left}
       {right}
+      {!isFrontCar && connector}
       {isFrontCar && <TrainFront />}
     </group>
   );
