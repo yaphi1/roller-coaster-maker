@@ -4,9 +4,11 @@ import Car from './Car';
 import { Group } from "three";
 import { TrackPath } from "../_utils/types";
 
-const minSpeed = 3;
+// const minSpeed = 3;
+const minSpeed = 0;
 const gravityStrength = 0.5;
-const horizontalDrag = 0.02;
+// const horizontalDrag = 0.02;
+const horizontalDrag = 0.22;
 
 export default function Train({
   path,
@@ -91,7 +93,7 @@ export default function Train({
   return (
     <>
       {carRefs.map((ref, i) => {
-        return (<Car carRef={ref} key={i} />);
+        return (<Car carRef={ref} isFrontCar={i === carRefs.length - 1} key={i} />);
       })}
     </>
   );

@@ -141,7 +141,7 @@ function buildTrackPieceVisual(path: Path) {
     return (
       <mesh key={i}>
         <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
-        <meshStandardMaterial color="red" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
+        <meshStandardMaterial color="red" roughness={0.3} metalness={0.7} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
       </mesh>
     );
   });
