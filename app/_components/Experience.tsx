@@ -10,7 +10,7 @@ export default function Experience({ builtTracks, cameraType }: {
 }) {
   return (
     <>
-      {cameraType === 'orbital'  && <OrbitControls target={[20, 0, 0]} />}
+      {cameraType === 'orbital'  && <OrbitControls target={[20, 0, 0]} zoomSpeed={0.2} />}
       <directionalLight position={[1, 2, 3]} intensity={1.5} />
       <ambientLight intensity={0.5} />
 
