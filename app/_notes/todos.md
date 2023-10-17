@@ -1,6 +1,4 @@
 # TODO:
-  - improve car graphics
-  - add scenery and textures
   - add clickable presets
   - add shareable url params for tracks
   - decide on camera: type, constraints, and controls
@@ -10,6 +8,7 @@
   - allow multiple coasters
   - add play/pause per coaster
   - allow color changes
+  - use tile-based collision to enable other roller coasters, paths, etc
 
 
 
