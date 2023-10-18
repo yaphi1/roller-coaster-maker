@@ -10,6 +10,8 @@ import {
   Track,
 } from './types';
 import { globalSettings } from './globalSettings';
+import { useContext, useMemo } from 'react';
+import { ColorContext } from '../page';
 
 export const straightawayLength = 4;
 export const trackWidth = 1;
@@ -135,38 +137,57 @@ function buildTrackPieceVisual(path: Path) {
   const middleRailPath = getMiddleRailPath(path);
   const crossPiecePaths = getCrossPiecePaths({ path, depth: trackPieceDepth, horizontalReach: 0.5 });
 
-  const sideRails = railPaths.map((railPath, i) => {
+  function SideRails({ material } : { material: JSX.Element }) {
     return (
-      <mesh key={i}>
-        <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
-        <meshStandardMaterial color="red" roughness={0.3} metalness={0.7} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
+      <>
+        {railPaths.map((railPath, i) => (
+          <mesh key={i}>
+            <tubeGeometry args={[railPath, tubularSegments, radius, radialSegments]} />
+            {material}
+          </mesh>
+        ))}
+      </>
+    );
+  };
+
+  function MiddleRail({ material } : { material: JSX.Element }) {
+    return (
+      <mesh>
+        <tubeGeometry args={[middleRailPath, tubularSegments, 0.15, radialSegments]} />
+        {material}
       </mesh>
     );
-  });
+  };
 
-  const middleRail = (
-    <mesh>
-      <tubeGeometry args={[middleRailPath, tubularSegments, 0.15, radialSegments]} />
-      <meshStandardMaterial color="white" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
-    </mesh>
-  );
-
-  const crossPieces = crossPiecePaths.map((crossPiecePath, i) => {
+  function CrossPieces({ material } : { material: JSX.Element }) {
     return (
-      <mesh key={i}>
-        <tubeGeometry args={[crossPiecePath, tubularSegments, 0.05, radialSegments]} />
-        <meshStandardMaterial color="white" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
-      </mesh>
+      <>
+        {crossPiecePaths.map((crossPiecePath, i) => (
+          <mesh key={i}>
+            <tubeGeometry args={[crossPiecePath, tubularSegments, 0.05, radialSegments]} />
+            {material}
+          </mesh>
+        ))}
+      </>
     );
-  });
+  };
 
-  return () => (
-    <group>
-      {sideRails}
-      {middleRail}
-      {crossPieces}
-    </group>
-  );
+  return () => {
+    const coasterColors = useContext(ColorContext)?.coasterColors[0];
+    const railColor = coasterColors?.rails;
+    const scaffoldingColor = coasterColors?.scaffolding;
+
+    const railMaterial = (<meshStandardMaterial color={railColor} roughness={0.3} metalness={0.7} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />);
+    const scaffoldingMaterial = (<meshStandardMaterial color={scaffoldingColor} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />);
+
+    return (
+      <group>
+        <SideRails material={railMaterial} />
+        <MiddleRail material={scaffoldingMaterial} />
+        <CrossPieces material={scaffoldingMaterial} />
+      </group>
+    );
+  };
 }
 
 function getRailPaths(path: Path, horizontalOffset = trackWidth / 2) {
@@ -260,9 +281,6 @@ export function getPathPoints(trackPath: Path) {
   return trackPathPoints
 }
 
-const supportMaterial = <meshStandardMaterial color="white" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />;
-const supportBaseMaterial = <meshStandardMaterial color="white" wireframe={globalSettings.isDebugMode} />;
-
 function buildTrackSupports(trackPath: Path): PathVisual[] {
   const tubularSegments = 20;
   const radius = 0.15;
@@ -275,18 +293,24 @@ function buildTrackSupports(trackPath: Path): PathVisual[] {
     const isValid = isValidSupport(supportPath, trackPathPoints);
     const { x, z } = supportPath.v1;
 
-    return () => isValid ? (
-      <group key={i}>
-        <mesh>
-          <tubeGeometry args={[supportPath, tubularSegments, radius, radialSegments]} />
-          {supportMaterial}
-        </mesh>
-        <mesh position={[x, 0, z]}>
-          <boxGeometry args={[0.5, 0.2, 0.5]} />
-          {supportBaseMaterial}
-        </mesh>
-      </group>
-    ) : (<></>);
+    return () => {
+      const scaffoldingColor = useContext(ColorContext)?.coasterColors[0]?.scaffolding;
+      const supportMaterial = <meshStandardMaterial color={scaffoldingColor} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />;
+      const supportBaseMaterial = <meshStandardMaterial color={scaffoldingColor} wireframe={globalSettings.isDebugMode} />;
+
+      return isValid ? (
+        <group key={i}>
+          <mesh>
+            <tubeGeometry args={[supportPath, tubularSegments, radius, radialSegments]} />
+            {supportMaterial}
+          </mesh>
+          <mesh position={[x, 0, z]}>
+            <boxGeometry args={[0.5, 0.2, 0.5]} />
+            {supportBaseMaterial}
+          </mesh>
+        </group>
+      ) : (<></>)
+    };
   });
 
   return supports;

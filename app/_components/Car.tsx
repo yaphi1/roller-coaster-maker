@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { RefObject } from "react";
+import { RefObject, useContext, useMemo } from "react";
 import { globalSettings } from "../_utils/globalSettings";
 import { Group } from "three";
+import { ColorContext } from '../page';
 
 export default function Car({ carRef, isFrontCar }: { carRef: RefObject<Group>, isFrontCar: boolean }) {
   return (
@@ -11,12 +12,14 @@ export default function Car({ carRef, isFrontCar }: { carRef: RefObject<Group>, 
   );
 }
 
-const bodyMaterial = (
-  <meshStandardMaterial
-    color="#0098db"
-    wireframe={globalSettings.isDebugMode}
-  />
-);
+function generateBodyMaterial(color = '#0098db') {
+  return (
+    <meshStandardMaterial
+      color={color}
+      wireframe={globalSettings.isDebugMode}
+    />
+  );
+}
 const metalMaterial = (
   <meshStandardMaterial
     color="silver"
@@ -35,7 +38,7 @@ const darkMetalMaterial = (
 );
 const seatMaterial = (
   <meshStandardMaterial
-    color="#0098db"
+    color="gray"
     roughness={0.3}
     metalness={0.7}
     wireframe={globalSettings.isDebugMode}
@@ -43,12 +46,6 @@ const seatMaterial = (
 );
 
 function CarModel({ isFrontCar = false }) {
-  const bottom = (<mesh position-y={0.25}><boxGeometry args={[1, 0.1, 1]} />{bodyMaterial}</mesh>);
-  const back = (<mesh position={[0, 0.45, -0.45]}><boxGeometry args={[1, 0.5, 0.1]} />{bodyMaterial}</mesh>);
-  const front = (<mesh position={[0, 0.45, 0.45]}><boxGeometry args={[1, 0.5, 0.1]} />{bodyMaterial}</mesh>);
-  const left = (<mesh position={[0.45, 0.45, 0]}><boxGeometry args={[0.1, 0.5, 1]} />{bodyMaterial}</mesh>);
-  const right = (<mesh position={[-0.45, 0.45, 0]}><boxGeometry args={[0.1, 0.5, 1]} />{bodyMaterial}</mesh>);
-
   return (
     <group>
       <CarBody isFrontCar={isFrontCar} />
@@ -59,6 +56,8 @@ function CarModel({ isFrontCar = false }) {
 }
 
 function CarBody({ isFrontCar = false }) {
+  const color = useContext(ColorContext)?.coasterColors[0]?.train;
+  const bodyMaterial = useMemo(() => generateBodyMaterial(color), [color]);
   const bottom = (<mesh position-y={0.25}><boxGeometry args={[1, 0.1, 1]} />{bodyMaterial}</mesh>);
   const back = (<mesh position={[0, 0.45, -0.45]}><boxGeometry args={[1, 0.5, 0.1]} />{bodyMaterial}</mesh>);
   const front = (<mesh position={[0, 0.45, 0.45]}><boxGeometry args={[1, 0.5, 0.1]} />{bodyMaterial}</mesh>);
@@ -74,7 +73,7 @@ function CarBody({ isFrontCar = false }) {
       {left}
       {right}
       {!isFrontCar && connector}
-      {isFrontCar && <TrainFront />}
+      {isFrontCar && <TrainFront bodyMaterial={bodyMaterial} />}
     </group>
   );
 };
@@ -173,7 +172,7 @@ function Wheel(
   );
 }
 
-function TrainFront() {
+function TrainFront({ bodyMaterial }: { bodyMaterial: JSX.Element }) {
   const width = 0.81;
   const height = 0.3;
   const shape = new THREE.Shape();

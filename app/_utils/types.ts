@@ -34,3 +34,9 @@ export type CollisionZone = {
 };
 
 export type CameraType = 'orbital' | 'coasterFocus' | 'firstPerson';
+
+export type CoasterColors = {
+  train: string;
+  rails: string;
+  scaffolding: string;
+};
