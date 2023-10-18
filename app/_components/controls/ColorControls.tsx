@@ -1,8 +1,8 @@
-import { CoasterColors } from "@/app/_utils/types";
 import { ColorContext } from "@/app/page";
 import { useContext } from "react";
 import { produce } from 'immer';
 import { defaultCoasterColors } from "@/app/_utils/defaults";
+import ColorButton from "./ColorButton";
 
 export default function ColorControls() {
   const colorContext = useContext(ColorContext);
@@ -13,29 +13,9 @@ export default function ColorControls() {
         Colors
       </div>
       <div className="flex gap-1">
-        Coaster:
-        <input type="color" value={colorContext?.coasterColors[0].train} onInput={(event) => {
-          const nextColor = event.currentTarget.value;
-          colorContext?.setCoasterColors(produce((draft) => {
-            draft[0].train = nextColor;
-          }));
-        }} />
-        
-        Rails:
-        <input type="color" value={colorContext?.coasterColors[0].rails} onInput={(event) => {
-          const nextColor = event.currentTarget.value;
-          colorContext?.setCoasterColors(produce((draft) => {
-            draft[0].rails = nextColor;
-          }));
-        }} />
-
-        Beams:
-        <input type="color" value={colorContext?.coasterColors[0].scaffolding} onInput={(event) => {
-          const nextColor = event.currentTarget.value;
-          colorContext?.setCoasterColors(produce((draft) => {
-            draft[0].scaffolding = nextColor;
-          }));
-        }} />
+        <ColorButton label={'Train'} coasterIndex={0} itemToRecolor={'train'} />
+        <ColorButton label={'Rails'} coasterIndex={0} itemToRecolor={'rails'} />
+        <ColorButton label={'Beams'} coasterIndex={0} itemToRecolor={'scaffolding'} />
 
         <button className="p-2 bg-slate-200 shadow-md" onClick={() => {
           colorContext?.setCoasterColors(produce((draft) => {

@@ -22,3 +22,10 @@ Hooks shouldn't be conditionally added to a function or else you'll get errors.
     If the early return happened, react would miss the hook and blow up.
 
 Remember to use useMemo if you want a similar situation to useEffect but you want the resulting values to be available outside the hook.
+
+If you want a list of object keys to be their own type, you can do something like this:
+  ```javascript
+  export type ColorableItem = 'train' | 'rails' | 'scaffolding';
+  export type CoasterColors = Record<ColorableItem, string>;
+  ```
+  That way, you don't have to have two sources of truth for the keys.

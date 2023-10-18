@@ -35,8 +35,6 @@ export type CollisionZone = {
 
 export type CameraType = 'orbital' | 'coasterFocus' | 'firstPerson';
 
-export type CoasterColors = {
-  train: string;
-  rails: string;
-  scaffolding: string;
-};
+export type ColorableItem = 'train' | 'rails' | 'scaffolding';
+
+export type CoasterColors = Record<ColorableItem, string>;
