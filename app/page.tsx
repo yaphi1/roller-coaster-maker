@@ -8,6 +8,7 @@ import { Dispatch, SetStateAction, createContext, useMemo, useState } from 'reac
 import startingTrackPieces from './_premadeTracks/000_starter';
 import { buildTrack } from './_utils/trackBuilder';
 import { CameraType, CoasterColors } from './_utils/types';
+import { defaultCoasterColors } from './_utils/defaults';
 
 const cameraSettings = {
   fov: 45,
@@ -22,12 +23,6 @@ export const ColorContext = createContext<{
   coasterColors: CoasterColors[];
   setCoasterColors: Dispatch<SetStateAction<CoasterColors[]>>
 } | null>(null);
-
-const defaultCoasterColors: CoasterColors = {
-  train: '#0098db',
-  rails: 'red',
-  scaffolding: 'white',
-};
 
 export default function Home() {
 
