@@ -17,7 +17,7 @@ export default function ColorControls() {
         <ColorButton label={'Rails'} coasterIndex={0} itemToRecolor={'rails'} />
         <ColorButton label={'Beams'} coasterIndex={0} itemToRecolor={'scaffolding'} />
 
-        <button className="p-2 bg-slate-200 shadow-md" onClick={() => {
+        <button className="bg-slate-200 shadow-md rounded-md p-2 hover:bg-yellow-200" onClick={() => {
           colorContext?.setCoasterColors(produce((draft) => {
             draft[0] = {...defaultCoasterColors};
           }));
