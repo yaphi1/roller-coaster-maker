@@ -1,15 +1,9 @@
 # TODO:
-  - add clickable presets
   - add shareable url params for tracks
-  - decide on camera: type, constraints, and controls
-  - bgm & sfx
   - undo/redo
   - add loop-the-loops
   - allow multiple coasters
-  - add play/pause per coaster
-  - allow color changes
   - use tile-based collision to enable other roller coasters, paths, etc
-
 
 
 
