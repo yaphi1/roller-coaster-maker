@@ -1,14 +1,16 @@
 import { CameraType } from "@/app/_utils/types";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export default function CameraControls({ setCameraType }:
   { setCameraType: Dispatch<SetStateAction<CameraType>> }
 ) {
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [volume, setVolume] = useState(0.5);
-  const audio = useMemo(() => {
+
+  useEffect(() => {
     const song = new Audio('/audio/waltz_medley.mp3'); // musical arrangement source: https://www.youtube.com/watch?v=ei7cpY0Bf4s
     song.loop = true;
-    return song;
+    setAudio(song);
   }, []);
   
   return (
@@ -20,14 +22,14 @@ export default function CameraControls({ setCameraType }:
         <button
           className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
           onClick={() => {
-            audio.play();
+            audio?.play();
           }}
         >
           Audio
         </button>
         <input type="number" min={0} max={1} step={0.1} value={volume} onInput={(event) => {
           const nextVolume = parseFloat(event.currentTarget.value);
-          audio.volume = nextVolume;
+          if (audio) { audio.volume = nextVolume; }
           setVolume(nextVolume);
         }} />
         
