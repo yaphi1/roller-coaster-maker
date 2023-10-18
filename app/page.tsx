@@ -30,6 +30,11 @@ export const ModalContext = createContext<{
   setCurrentModal: Dispatch<SetStateAction<string | null>>
 } | null>(null);
 
+export const CoasterContext = createContext<{
+  isRunning: boolean;
+  setIsRunning: Dispatch<SetStateAction<boolean>>
+} | null>(null);
+
 export default function Home() {
 
   // TODO: change later to accommodate multiple tracks
@@ -37,6 +42,7 @@ export default function Home() {
   const [cameraType, setCameraType] = useState<CameraType>('orbital');
   const [coasterColors, setCoasterColors] = useState([ defaultCoasterColors ]);
   const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
 
   const tracks = [
     {
@@ -56,24 +62,26 @@ export default function Home() {
       const shouldCloseModal = !(target.closest('[data-do-not-close-modal]'));
       if (shouldCloseModal) { setCurrentModal(null); }
     }}>
-      <ModalContext.Provider value={{ currentModal, setCurrentModal }}>
-        <ColorContext.Provider value={{ coasterColors, setCoasterColors }}>
-          <CameraContext.Provider value={cameraType}>
-            <Canvas
-              camera={cameraSettings}
-              // orthographic
-            >
-              <Experience builtTracks={builtTracks} cameraType={cameraType} />
-            </Canvas>
-          </CameraContext.Provider>
-          <Controls
-            trackPieces={trackPieces}
-            builtTracks={builtTracks}
-            setTrackPieces={setTrackPieces}
-            setCameraType={setCameraType}
-          />
-        </ColorContext.Provider>
-      </ModalContext.Provider>
+      <CoasterContext.Provider value={{ isRunning, setIsRunning }}>
+        <ModalContext.Provider value={{ currentModal, setCurrentModal }}>
+          <ColorContext.Provider value={{ coasterColors, setCoasterColors }}>
+            <CameraContext.Provider value={cameraType}>
+              <Canvas
+                camera={cameraSettings}
+                // orthographic
+              >
+                <Experience builtTracks={builtTracks} cameraType={cameraType} />
+              </Canvas>
+            </CameraContext.Provider>
+            <Controls
+              trackPieces={trackPieces}
+              builtTracks={builtTracks}
+              setTrackPieces={setTrackPieces}
+              setCameraType={setCameraType}
+            />
+          </ColorContext.Provider>
+        </ModalContext.Provider>
+      </CoasterContext.Provider>
     </main>
   );
 }

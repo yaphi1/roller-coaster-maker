@@ -2,8 +2,12 @@ import Train from './Train';
 import { Track } from '../_utils/types';
 import { globalSettings } from '../_utils/globalSettings';
 import PathDebugger from './PathDebugger';
+import { useContext } from 'react';
+import { CoasterContext } from '../page';
 
 export default function RollerCoaster({ track }: { track: Track }) {
+  const coasterContext = useContext(CoasterContext);
+
   return (
     <>
       {track.visuals.map((TrackPiece, i) => {
@@ -11,9 +15,7 @@ export default function RollerCoaster({ track }: { track: Track }) {
         return (<TrackPiece key={i} />);
       })}
 
-      <Train path={track.path} />
-      {/* <Train path={track.path} carCount={3} startingProgress={0.5} /> */}
-
+      {coasterContext?.isRunning && <Train path={track.path} />}
       {globalSettings.isDebugMode && <PathDebugger path={track.path} />}
     </>
   );

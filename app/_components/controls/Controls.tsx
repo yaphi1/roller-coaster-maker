@@ -4,6 +4,7 @@ import CameraControls from "./CameraControls";
 import TrackEditorControls from "./TrackEditorControls";
 import PresetControls from "./PresetControls";
 import ColorControls from "./ColorControls";
+import PlaybackControls from "./PlaybackControls";
 
 export default function Controls(
   { trackPieces, setTrackPieces, builtTracks, setCameraType }:
@@ -17,9 +18,12 @@ export default function Controls(
   return (
     <>
       <TrackEditorControls trackPieces={trackPieces} setTrackPieces={setTrackPieces} builtTracks={builtTracks} />
-      <CameraControls setCameraType={setCameraType} />
       <PresetControls setTrackPieces={setTrackPieces} />
       <ColorControls />
+      <div className="fixed z-10 right-0 bottom-0 flex">
+        <PlaybackControls />
+        <CameraControls setCameraType={setCameraType} />
+      </div>
     </>
   );
 }

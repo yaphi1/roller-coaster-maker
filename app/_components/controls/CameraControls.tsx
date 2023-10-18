@@ -1,40 +1,15 @@
 import { CameraType } from "@/app/_utils/types";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-
-const audibleButNotOverpoweringVolume = 0.07; // 0.05 is audible when I'm silent. 0.1 is about the same as my voice. 0.07 is the sweet spot.
+import { Dispatch, SetStateAction } from "react";
 
 export default function CameraControls({ setCameraType }:
   { setCameraType: Dispatch<SetStateAction<CameraType>> }
 ) {
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [volume, setVolume] = useState(audibleButNotOverpoweringVolume);
-
-  useEffect(() => {
-    const song = new Audio('/audio/waltz_medley.mp3'); // musical arrangement source: https://www.youtube.com/watch?v=ei7cpY0Bf4s
-    song.loop = true;
-    setAudio(song);
-  }, []);
-  
   return (
-    <div className="fixed z-10 right-0 bottom-0 bg-white/50 rounded-md p-2 m-2 text-slate-700">
+    <div className="bg-white/50 rounded-md p-2 m-2 text-slate-700">
       <div className="font-bold mb-1">
         Camera
       </div>
       <div className="flex gap-1">
-        <button
-          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => {
-            audio?.play();
-          }}
-        >
-          Audio
-        </button>
-        <input type="number" min={0} max={1} step={0.01} value={volume} onInput={(event) => {
-          const nextVolume = parseFloat(event.currentTarget.value);
-          if (audio) { audio.volume = nextVolume; }
-          setVolume(nextVolume);
-        }} />
-        
         <button
           className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
           onClick={() => { setCameraType('orbital') }}
