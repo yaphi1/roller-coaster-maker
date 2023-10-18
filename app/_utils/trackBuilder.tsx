@@ -8,7 +8,6 @@ import {
   Piece,
   PathVisual,
   Track,
-  TrackPath,
 } from './types';
 import { globalSettings } from './globalSettings';
 
@@ -18,6 +17,8 @@ const trackPieceDepth = 0.1;
 export const desiredPointsPerTrackPiece = 5;
 const spacesBetweenTrackPiecePoints = desiredPointsPerTrackPiece - 1;
 const desiredLengthBetweenPathPoints = straightawayLength / spacesBetweenTrackPiecePoints;
+
+function isIndexSpacedOutEnough(value: unknown, i: number) { return i % 4 === 0; }
 
 function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDirection): Piece {
   const { x, y, z } = startPoint;
@@ -59,7 +60,6 @@ function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDire
     direction,
     nextDirection,
     trackPieceVisual: buildTrackPieceVisual(path),
-    supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
 }
 
@@ -82,7 +82,6 @@ function buildStraightPiece(startPoint: XYZ, direction: XYZ): Piece {
     direction,
     nextDirection: direction,
     trackPieceVisual: buildTrackPieceVisual(path),
-    supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
 }
 
@@ -124,7 +123,6 @@ function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: TurnDire
     direction,
     nextDirection,
     trackPieceVisual: buildTrackPieceVisual(path),
-    supportPaths: getSupportPolePaths({ path, depthOfTopPoint: trackPieceDepth }),
   };
 }
 
@@ -216,14 +214,15 @@ function getSupportPolePaths(
   { path: Path, depthOfTopPoint: number }
 ) {
   const centerRailPoints = getPointsOffsetFromPath(path, 0, -depthOfTopPoint);
+  const supportPolePoints = centerRailPoints.filter(isIndexSpacedOutEnough);
 
-  const supportPolePaths = centerRailPoints.map((centerRailPoint, i) => {
+  const supportPolePaths = supportPolePoints.map((supportPolePoint, i) => {
     const groundPoint = new THREE.Vector3(...[
-      centerRailPoint.x,
+      supportPolePoint.x,
       0 - depthOfTopPoint,
-      centerRailPoint.z,
+      supportPolePoint.z,
     ]);
-    const polePath = new THREE.LineCurve3(centerRailPoint, groundPoint);
+    const polePath = new THREE.LineCurve3(supportPolePoint, groundPoint);
 
     return polePath;
   });
@@ -255,27 +254,38 @@ function isValidSupport(supportPath: THREE.LineCurve3, trackPathPoints: THREE.Ve
   return true;
 }
 
-export function getTrackPathPoints(trackPath: TrackPath) {
+export function getPathPoints(trackPath: Path) {
   const trackPathPointCount = Math.ceil(trackPath.getLength() / desiredLengthBetweenPathPoints);
   const trackPathPoints = trackPath.getSpacedPoints(trackPathPointCount);
   return trackPathPoints
 }
 
-function buildTrackSupports(trackPath: TrackPath, supportPaths: THREE.LineCurve3[]): PathVisual[] {
+const supportMaterial = <meshStandardMaterial color="white" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />;
+const supportBaseMaterial = <meshStandardMaterial color="white" wireframe={globalSettings.isDebugMode} />;
+
+function buildTrackSupports(trackPath: Path): PathVisual[] {
   const tubularSegments = 20;
-  const radius = 0.1;
+  const radius = 0.15;
   const radialSegments = 8;
 
-  const trackPathPoints = getTrackPathPoints(trackPath);
+  const trackPathPoints = getPathPoints(trackPath);
+  const supportPaths = getSupportPolePaths({ path: trackPath, depthOfTopPoint: trackPieceDepth + 0.1 });
 
   const supports = supportPaths.map((supportPath, i) => {
     const isValid = isValidSupport(supportPath, trackPathPoints);
+    const { x, z } = supportPath.v1;
 
     return () => isValid ? (
-      <mesh key={i}>
-        <tubeGeometry args={[supportPath, tubularSegments, radius, radialSegments]} />
-        <meshStandardMaterial color="black" side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />
-      </mesh>
+      <group key={i}>
+        <mesh>
+          <tubeGeometry args={[supportPath, tubularSegments, radius, radialSegments]} />
+          {supportMaterial}
+        </mesh>
+        <mesh position={[x, 0, z]}>
+          <boxGeometry args={[0.5, 0.2, 0.5]} />
+          {supportBaseMaterial}
+        </mesh>
+      </group>
     ) : (<></>);
   });
 
@@ -334,9 +344,8 @@ export function buildTrack({
   pieceTypes: PieceType[],
 }): Track {
 
-  const trackPath: TrackPath = new THREE.CurvePath();
+  const trackPath: Path = new THREE.CurvePath();
   const visuals: PathVisual[] = [];
-  const supportPaths: THREE.LineCurve3[] = [];
   const pieces: Piece[] = [];
 
   pieceTypes.forEach(pieceType => {
@@ -347,10 +356,9 @@ export function buildTrack({
     direction = piece.nextDirection;
 
     visuals.push(piece.trackPieceVisual);
-    supportPaths.push(...piece.supportPaths);
   });
 
-  const trackSupports = buildTrackSupports(trackPath, supportPaths);
+  const trackSupports = buildTrackSupports(trackPath);
   visuals.push(...trackSupports);
 
   return {

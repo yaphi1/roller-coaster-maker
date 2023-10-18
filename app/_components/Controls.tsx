@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { CameraType, CollisionZone, Piece, PieceType, Track, XYZ } from "../_utils/types";
-import { buildPiece, desiredPointsPerTrackPiece, getTrackPathPoints, trackWidth } from "../_utils/trackBuilder";
+import { buildPiece, desiredPointsPerTrackPiece, getPathPoints, trackWidth } from "../_utils/trackBuilder";
 
 function getNextForwardPiece(latestPiece: Piece) {
   let nextPiece: PieceType = 'straight';
@@ -23,7 +23,7 @@ function getNextDownPiece(latestPiece: Piece) {
 }
 
 function isPieceBlocked(pieceType: PieceType, builtTrack: Track) {
-  const trackPathPoints = getTrackPathPoints(builtTrack.path);
+  const trackPathPoints = getPathPoints(builtTrack.path);
   const latestPiece = getLatestPiece(builtTrack);
   const { nextDirection } = latestPiece;
   const nextStartPoint = latestPiece.endPoint;

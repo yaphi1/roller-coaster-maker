@@ -8,7 +8,7 @@ export type PieceType = 'straight' | 'right' | 'left' | 'up' | 'down';
 export type TurnDirection = 'right' | 'left';
 export type RampDirection = 'up' | 'down';
 
-export type Path = THREE.LineCurve3 | THREE.QuadraticBezierCurve3 | THREE.CatmullRomCurve3;
+export type Path = THREE.LineCurve3 | THREE.QuadraticBezierCurve3 | THREE.CatmullRomCurve3 | THREE.CurvePath<THREE.Vector3>;
 
 export type Piece = {
   path: Path;
@@ -17,15 +17,12 @@ export type Piece = {
   direction: XYZ;
   nextDirection: XYZ;
   trackPieceVisual: () => JSX.Element;
-  supportPaths: THREE.LineCurve3[];
 };
 
 export type PathVisual = ((() => JSX.Element) | undefined);
 
-export type TrackPath = THREE.CurvePath<THREE.Vector3>;
-
 export type Track = {
-  path: TrackPath;
+  path: Path;
   visuals: PathVisual[];
   pieces: Piece[],
 };

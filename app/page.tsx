@@ -5,8 +5,9 @@ import { Canvas } from '@react-three/fiber';
 import Experience from './_components/Experience';
 import Controls from './_components/Controls';
 import { createContext, useMemo, useState } from 'react';
-import startingTrackPieces from './_premadeTracks/000_starter';
+// import startingTrackPieces from './_premadeTracks/000_starter';
 // import startingTrackPieces from './_premadeTracks/001_two_hills';
+import startingTrackPieces from './_premadeTracks/002_big_drop';
 import { buildTrack } from './_utils/trackBuilder';
 import { CameraType } from './_utils/types';
 

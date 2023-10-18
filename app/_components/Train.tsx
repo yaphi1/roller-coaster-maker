@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { RefObject, useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
 import { Group } from "three";
-import { CameraType, TrackPath } from "../_utils/types";
+import { CameraType, Path } from "../_utils/types";
 import { CameraContext } from "../page";
 
 const stopForDebugging = false;
@@ -12,7 +12,7 @@ const minSpeed = stopForDebugging ? 0 : 3;
 const gravityStrength = 0.5;
 const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
 
-function updateCamera(cameraType: CameraType | null, path: TrackPath, progress:number) {
+function updateCamera(cameraType: CameraType | null, path: Path, progress:number) {
   const camera = useThree().camera;
   if (!cameraType || cameraType === 'orbital') { return; }
 
@@ -51,7 +51,7 @@ export default function Train({
   spaceBetweenCarts = 1.2,
   startingProgress = 0,
 }: {
-  path: TrackPath,
+  path: Path,
   carCount?: number,
   spaceBetweenCarts?: number,
   startingProgress?: number,
@@ -86,7 +86,7 @@ export default function Train({
     itemRef.current.position.copy(path.getPointAt(offsetProgress));
   }
   
-  function updateRotation(itemRef: RefObject<Group>, updatedProgress: number, offset = 0, path: TrackPath) {
+  function updateRotation(itemRef: RefObject<Group>, updatedProgress: number, offset = 0, path: Path) {
     if (!itemRef.current) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
     const tangent = path.getTangentAt(offsetProgress);
@@ -95,14 +95,14 @@ export default function Train({
     itemRef.current.lookAt(cartCenter.add(tangent));
   }
 
-  function updateSpeed(updatedProgress: number, path: TrackPath) {
+  function updateSpeed(updatedProgress: number, path: Path) {
     const verticalChange = path.getTangentAt(updatedProgress).y;
     const verticalDrag = verticalChange * gravityStrength;
     const newSpeed = Math.max(speed - verticalDrag - horizontalDrag, minSpeed);
     setSpeed(newSpeed);
   }
 
-  function updateCar(itemRef: RefObject<Group>, updatedProgress: number, offset: number, path: TrackPath) {
+  function updateCar(itemRef: RefObject<Group>, updatedProgress: number, offset: number, path: Path) {
     updatePosition(itemRef, updatedProgress, offset);
     updateRotation(itemRef, updatedProgress, offset, path);
     updateSpeed(updatedProgress, path);

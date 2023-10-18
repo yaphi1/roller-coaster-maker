@@ -1,7 +1,7 @@
-import { TrackPath } from "../_utils/types";
+import { Path } from "../_utils/types";
 import { Line } from "@react-three/drei";
 
-export default function PathDebugger({ path } : { path: TrackPath }) {
+export default function PathDebugger({ path } : { path: Path }) {
   return (
     <Line
       points={path.getPoints()}
