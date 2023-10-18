@@ -1,6 +1,9 @@
 import { CameraType } from "@/app/_utils/types";
 import { Dispatch, SetStateAction } from "react";
 
+const audio = new Audio('/audio/waltz_medley.mp3'); // musical arrangement source: https://www.youtube.com/watch?v=ei7cpY0Bf4s
+audio.loop = true;
+
 export default function CameraControls({ setCameraType }:
   { setCameraType: Dispatch<SetStateAction<CameraType>> }
 ) {
@@ -10,6 +13,15 @@ export default function CameraControls({ setCameraType }:
         Camera
       </div>
       <div className="flex gap-1">
+        <button
+          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+          onClick={() => {
+            audio.play();
+          }}
+        >
+          Audio
+        </button>
+        
         <button
           className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
           onClick={() => { setCameraType('orbital') }}
