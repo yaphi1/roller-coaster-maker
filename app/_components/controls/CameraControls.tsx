@@ -1,11 +1,13 @@
 import { CameraType } from "@/app/_utils/types";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
+const audibleButNotOverpoweringVolume = 0.07; // 0.05 is audible when I'm silent. 0.1 is about the same as my voice. 0.07 is the sweet spot.
+
 export default function CameraControls({ setCameraType }:
   { setCameraType: Dispatch<SetStateAction<CameraType>> }
 ) {
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(audibleButNotOverpoweringVolume);
 
   useEffect(() => {
     const song = new Audio('/audio/waltz_medley.mp3'); // musical arrangement source: https://www.youtube.com/watch?v=ei7cpY0Bf4s
@@ -27,7 +29,7 @@ export default function CameraControls({ setCameraType }:
         >
           Audio
         </button>
-        <input type="number" min={0} max={1} step={0.1} value={volume} onInput={(event) => {
+        <input type="number" min={0} max={1} step={0.01} value={volume} onInput={(event) => {
           const nextVolume = parseFloat(event.currentTarget.value);
           if (audio) { audio.volume = nextVolume; }
           setVolume(nextVolume);
