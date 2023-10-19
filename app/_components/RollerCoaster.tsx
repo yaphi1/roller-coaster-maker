@@ -3,7 +3,7 @@ import { Track } from '../_utils/types';
 import { globalSettings } from '../_utils/globalSettings';
 import PathDebugger from './PathDebugger';
 import { useContext } from 'react';
-import { CoasterContext } from '../page';
+import { CoasterContext } from './App';
 
 export default function RollerCoaster({ track }: { track: Track }) {
   const coasterContext = useContext(CoasterContext);

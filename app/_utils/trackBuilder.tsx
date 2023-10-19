@@ -10,8 +10,8 @@ import {
   Track,
 } from './types';
 import { globalSettings } from './globalSettings';
-import { useContext, useMemo } from 'react';
-import { ColorContext } from '../page';
+import { useContext } from 'react';
+import { ColorContext } from '../_components/App';
 
 export const straightawayLength = 4;
 export const trackWidth = 1;

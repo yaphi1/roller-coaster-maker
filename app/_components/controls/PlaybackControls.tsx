@@ -1,5 +1,5 @@
 import { globalSettings } from "@/app/_utils/globalSettings";
-import { CoasterContext } from "@/app/page";
+import { CoasterContext } from "../App";
 import { useContext, useEffect, useState } from "react";
 
 const audibleButNotOverpoweringVolume = 0.07; // 0.05 is audible when I'm silent. 0.1 is about the same as my voice. 0.07 is the sweet spot.

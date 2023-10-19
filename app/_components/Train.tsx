@@ -4,7 +4,7 @@ import { useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
 import { Group } from "three";
 import { CameraType, Path } from "../_utils/types";
-import { CameraContext } from "../page";
+import { CameraContext } from './App';
 
 const stopForDebugging = false;
 

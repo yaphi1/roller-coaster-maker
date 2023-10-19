@@ -1,6 +1,6 @@
 import { useContext, useId } from "react";
 import ColorPicker from "./ColorPicker";
-import { ColorContext, ModalContext } from "@/app/page";
+import { ColorContext, ModalContext } from "../App";
 import { ColorableItem } from "@/app/_utils/types";
 
 export default function ColorButton({ label, coasterIndex, itemToRecolor }: {

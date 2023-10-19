@@ -1,5 +1,5 @@
 import { ColorableItem } from "@/app/_utils/types";
-import { ColorContext } from "@/app/page";
+import { ColorContext } from "../App";
 import { produce } from "immer";
 import { useContext } from "react";
 import { HexColorPicker, HexColorInput } from "react-colorful";

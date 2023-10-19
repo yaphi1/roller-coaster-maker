@@ -1,4 +1,4 @@
-import { ColorContext } from "@/app/page";
+import { ColorContext } from '../App';
 import { useContext } from "react";
 import { produce } from 'immer';
 import { defaultCoasterColors } from "@/app/_utils/defaults";

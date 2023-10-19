@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useContext, useMemo } from "react";
 import { globalSettings } from "../_utils/globalSettings";
-import { ColorContext } from '../page';
+import { ColorContext } from './App';
 
 export default function Car({ carRef, isFrontCar }: {
   carRef: (el: THREE.Group<THREE.Object3DEventMap> | null) => void,
