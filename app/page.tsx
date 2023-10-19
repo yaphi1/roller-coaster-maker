@@ -4,10 +4,10 @@ import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import Experience from './_components/Experience';
 import Controls from './_components/controls/Controls';
-import { Dispatch, SetStateAction, createContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, createContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import startingTrackPieces from './_premadeTracks/000_starter';
 import { buildTrack } from './_utils/trackBuilder';
-import { CameraType, CoasterColors } from './_utils/types';
+import { CameraType, CoasterColors, Track } from './_utils/types';
 import { defaultCoasterColors } from './_utils/defaults';
 import { decodeTrack, encodeTrack, stripHexHashes, updateHash } from './_utils/urlHashUtils';
 import { produce } from 'immer';
@@ -46,6 +46,7 @@ export default function Home() {
   const [coasterColors, setCoasterColors] = useState([ defaultCoasterColors ]);
   const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [builtTracks, setBuiltTracks] = useState<Track[]>([]);
 
   // This syncs the url hash with the track & color data.
   // TODO: clean this up later. I rushed at the end.
@@ -80,18 +81,20 @@ export default function Home() {
       updateHash(params.toString());
     }
   }, [trackPieces, coasterColors]);
+  
+  useLayoutEffect(() => {
+    const tracks = [
+      {
+        startPoint: { x: 0, y: 0.3, z: 0 },
+        direction: { x: 1, y: 0, z: 0 },
+        pieceTypes: trackPieces,
+      },
+    ];
 
-  const tracks = [
-    {
-      startPoint: { x: 0, y: 0.3, z: 0 },
-      direction: { x: 1, y: 0, z: 0 },
-      pieceTypes: trackPieces,
-    },
-  ];
-
-  const builtTracks = useMemo(() => {
-    return tracks.map(track => buildTrack(track));
-  }, [tracks]);
+    setBuiltTracks(
+      tracks.map(track => buildTrack(track))
+    );
+  }, [trackPieces]);
 
   return (
     <main className="h-screen" onClick={(event) => {

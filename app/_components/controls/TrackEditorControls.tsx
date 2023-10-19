@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CollisionZone, Piece, PieceType, Track, XYZ } from "@/app/_utils/types";
 import { buildPiece, desiredPointsPerTrackPiece, getPathPoints, trackWidth } from "@/app/_utils/trackBuilder";
 
@@ -10,9 +10,31 @@ export default function TrackEditorControls(
     builtTracks: Track[],
   }
 ) {
-  const builtTrack = builtTracks[0];
-  const latestPiece = getLatestPiece(builtTrack);
-  const isMinTrackSize = trackPieces.length <= 3;
+  // const builtTrack = builtTracks[0];
+
+  // if(!builtTrack) {
+  //   return <></>;
+  // }
+
+  const [builtTrack, setBuiltTrack] = useState<Track | undefined>();
+  const [latestPiece, setLatestPiece] = useState<Piece | undefined>();
+  const [isMinTrackSize, setIsMinTrackSize] = useState<boolean>(false);
+
+  useEffect(() => {
+    setBuiltTrack(builtTracks[0]);
+  }, [builtTracks]);
+  
+  useEffect(() => {
+    setLatestPiece(getLatestPiece(builtTrack));
+  }, [builtTrack]);
+
+  useEffect(() => {
+    setIsMinTrackSize(trackPieces.length <= 3);
+  }, [trackPieces]);
+
+  if(!builtTrack || !trackPieces || !latestPiece) {
+    return <></>;
+  }
 
   return (
     <>
@@ -106,9 +128,12 @@ function getNextDownPiece(latestPiece: Piece) {
   return nextPiece;
 }
 
-function isPieceBlocked(pieceType: PieceType, builtTrack: Track) {
-  const trackPathPoints = getPathPoints(builtTrack.path);
+function isPieceBlocked(pieceType: PieceType | undefined, builtTrack: Track) {
+  if (!pieceType || !builtTrack) { return; }
   const latestPiece = getLatestPiece(builtTrack);
+  if (!latestPiece) { return; }
+
+  const trackPathPoints = getPathPoints(builtTrack.path);
   const { nextDirection } = latestPiece;
   const nextStartPoint = latestPiece.endPoint;
   const potentialPiece = buildPiece(pieceType, nextStartPoint, nextDirection);
@@ -193,7 +218,8 @@ function getCollisionZone(potentialPiece: Piece, nextStartPoint: XYZ, nextDirect
   return collisionZone;
 }
 
-function getLatestPiece(builtTrack: Track) {
+function getLatestPiece(builtTrack: Track | null | undefined) {
+  if (!builtTrack) { return; }
   const { pieces } = builtTrack;
   const latestPieceIndex = pieces.length - 1;
   return pieces[latestPieceIndex];
