@@ -172,7 +172,7 @@ function buildTrackPieceVisual(path: Path) {
     );
   };
 
-  return () => {
+  const TrackPieceVisual = () => {
     const coasterColors = useContext(ColorContext)?.coasterColors[0];
     const railColor = coasterColors?.rails;
     const scaffoldingColor = coasterColors?.scaffolding;
@@ -188,6 +188,8 @@ function buildTrackPieceVisual(path: Path) {
       </group>
     );
   };
+
+  return TrackPieceVisual;
 }
 
 function getRailPaths(path: Path, horizontalOffset = trackWidth / 2) {
@@ -293,7 +295,7 @@ function buildTrackSupports(trackPath: Path): PathVisual[] {
     const isValid = isValidSupport(supportPath, trackPathPoints);
     const { x, z } = supportPath.v1;
 
-    return () => {
+    const trackSupport = () => {
       const scaffoldingColor = useContext(ColorContext)?.coasterColors[0]?.scaffolding;
       const supportMaterial = <meshStandardMaterial color={scaffoldingColor} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />;
       const supportBaseMaterial = <meshStandardMaterial color={scaffoldingColor} wireframe={globalSettings.isDebugMode} />;
@@ -311,6 +313,8 @@ function buildTrackSupports(trackPath: Path): PathVisual[] {
         </group>
       ) : (<></>)
     };
+
+    return trackSupport;
   });
 
   return supports;

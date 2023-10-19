@@ -91,7 +91,7 @@ export default function Home() {
 
   const builtTracks = useMemo(() => {
     return tracks.map(track => buildTrack(track));
-  }, [trackPieces]);
+  }, [trackPieces, tracks]);
 
   return (
     <main className="h-screen" onClick={(event) => {

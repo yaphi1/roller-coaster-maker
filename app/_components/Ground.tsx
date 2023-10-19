@@ -21,7 +21,7 @@ export default function Ground() {
     grassTexture.repeat.set(500, 500);
     grassTexture.wrapS = THREE.RepeatWrapping;
     grassTexture.wrapT = THREE.RepeatWrapping;
-  }, []);
+  }, [textures]);
 
   const { scene } = useThree();
   scene.background = textures.skyTexture;

@@ -12,8 +12,7 @@ const minSpeed = stopForDebugging ? 0 : 3;
 const gravityStrength = 0.5;
 const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
 
-function updateCamera(cameraType: CameraType | null, path: Path, progress:number) {
-  const camera = useThree().camera;
+function updateCamera(camera: THREE.Camera & { manual?: boolean | undefined; }, cameraType: CameraType | null, path: Path, progress:number) {
   if (!cameraType || cameraType === 'orbital') { return; }
 
   const coasterPosition = path.getPointAt(progress);
@@ -56,12 +55,17 @@ export default function Train({
   spaceBetweenCarts?: number,
   startingProgress?: number,
 }) {
-  const carRefs = (new Array(carCount)).fill(null).map(ref => useRef<Group>(null));
+  const carRefs: RefObject<THREE.Group<THREE.Object3DEventMap>>[] = [];
+  for (let i = 0; i < carCount; i++) {
+    carRefs.push(useRef<Group>(null));
+  }
+
   const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
 
+  const camera = useThree().camera;
   const cameraType = useContext(CameraContext);
-  updateCamera(cameraType, path, progress);
+  updateCamera(camera, cameraType, path, progress);
 
   const trainMidpoint = (carRefs.length / 2) - 0.5;
   const trackLength = useMemo(() => {
