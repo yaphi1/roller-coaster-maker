@@ -1,5 +1,4 @@
 # TODO:
-  - add side details on coaster
   - undo/redo
   - add loop-the-loops
   - add other pieces: station, chain lift

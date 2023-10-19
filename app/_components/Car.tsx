@@ -22,7 +22,7 @@ function generateBodyMaterial(color = '#0098db') {
 }
 const metalMaterial = (
   <meshStandardMaterial
-    color="silver"
+    color="#ffffff"
     roughness={0.3}
     metalness={0.7}
     wireframe={globalSettings.isDebugMode}
@@ -30,7 +30,7 @@ const metalMaterial = (
 );
 const darkMetalMaterial = (
   <meshStandardMaterial
-    color="#888"
+    color="#888888"
     roughness={0.3}
     metalness={0.7}
     wireframe={globalSettings.isDebugMode}
@@ -51,6 +51,22 @@ function CarModel({ isFrontCar = false }) {
       <CarBody isFrontCar={isFrontCar} />
       <Seats />
       <Wheels />
+      <Decorations />
+    </group>
+  );
+}
+
+function Decorations() {
+  return (
+    <group>
+      <mesh scale-z={0.3} scale-x={0.4} rotation-x={Math.PI * 0.5} position={[-0.5, 0.5, 0]}>
+        <capsuleGeometry args={[0.18, 0.4]} />
+        {metalMaterial}
+      </mesh>
+      <mesh scale-z={0.3} scale-x={0.4} rotation-x={Math.PI * 0.5} position={[0.5, 0.5, 0]}>
+        <capsuleGeometry args={[0.18, 0.4]} />
+        {metalMaterial}
+      </mesh>
     </group>
   );
 }
