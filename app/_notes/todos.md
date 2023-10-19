@@ -1,7 +1,8 @@
 # TODO:
-  - add shareable url params for tracks
+  - add side details on coaster
   - undo/redo
   - add loop-the-loops
+  - add other pieces: station, chain lift
   - allow multiple coasters
   - use tile-based collision to enable other roller coasters, paths, etc
 

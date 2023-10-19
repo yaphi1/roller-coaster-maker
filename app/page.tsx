@@ -4,11 +4,13 @@ import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import Experience from './_components/Experience';
 import Controls from './_components/controls/Controls';
-import { Dispatch, SetStateAction, createContext, useId, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, createContext, useEffect, useMemo, useRef, useState } from 'react';
 import startingTrackPieces from './_premadeTracks/000_starter';
 import { buildTrack } from './_utils/trackBuilder';
 import { CameraType, CoasterColors } from './_utils/types';
 import { defaultCoasterColors } from './_utils/defaults';
+import { decodeTrack, encodeTrack, stripHexHashes } from './_utils/urlHashUtils';
+import { produce } from 'immer';
 
 const cameraSettings = {
   fov: 45,
@@ -36,6 +38,7 @@ export const CoasterContext = createContext<{
 } | null>(null);
 
 export default function Home() {
+  const isFirstRender = useRef(true);
 
   // TODO: change later to accommodate multiple tracks
   const [trackPieces, setTrackPieces] = useState(startingTrackPieces);
@@ -43,6 +46,40 @@ export default function Home() {
   const [coasterColors, setCoasterColors] = useState([ defaultCoasterColors ]);
   const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+
+  // This syncs the url hash with the track & color data.
+  // TODO: clean this up later. I rushed at the end.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+
+      const currentHash = window.location.hash.slice(1); // slice removes the "#"
+      if (currentHash) {
+        const params = new URLSearchParams(currentHash);
+
+        setCoasterColors(produce((draft) => {
+          draft[0] = {
+            train: '#' + params.get('train') ?? 'ffffff',
+            rails: '#' + params.get('rails') ?? 'ffffff',
+            scaffolding: '#' + params.get('scaffolding') ?? 'ffffff',
+          };
+        }));
+
+        const encodedPieces = params.get('p') ?? 'sss'; // default three straight pieces just in case
+        const decodedPieces = decodeTrack(encodedPieces);
+        setTrackPieces(produce((draft) => {
+          return decodedPieces
+        }));
+      }
+    }
+    else if (!isFirstRender.current) {
+      const params = new URLSearchParams({
+        ...stripHexHashes(coasterColors[0]),
+        p: encodeTrack(trackPieces),
+      });
+      window.location.hash = params.toString();
+    }
+  }, [trackPieces, coasterColors]);
 
   const tracks = [
     {
