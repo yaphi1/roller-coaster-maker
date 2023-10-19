@@ -295,7 +295,7 @@ function buildTrackSupports(trackPath: Path): PathVisual[] {
     const isValid = isValidSupport(supportPath, trackPathPoints);
     const { x, z } = supportPath.v1;
 
-    const trackSupport = () => {
+    const TrackSupport = () => {
       const scaffoldingColor = useContext(ColorContext)?.coasterColors[0]?.scaffolding;
       const supportMaterial = <meshStandardMaterial color={scaffoldingColor} side={THREE.DoubleSide} wireframe={globalSettings.isDebugMode} />;
       const supportBaseMaterial = <meshStandardMaterial color={scaffoldingColor} wireframe={globalSettings.isDebugMode} />;
@@ -314,7 +314,7 @@ function buildTrackSupports(trackPath: Path): PathVisual[] {
       ) : (<></>)
     };
 
-    return trackSupport;
+    return TrackSupport;
   });
 
   return supports;

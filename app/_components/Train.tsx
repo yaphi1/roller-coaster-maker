@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useFrame, useThree } from "@react-three/fiber";
-import { RefObject, useContext, useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
 import { Group } from "three";
 import { CameraType, Path } from "../_utils/types";
@@ -55,10 +55,9 @@ export default function Train({
   spaceBetweenCarts?: number,
   startingProgress?: number,
 }) {
-  const carRefs: RefObject<THREE.Group<THREE.Object3DEventMap>>[] = [];
-  for (let i = 0; i < carCount; i++) {
-    carRefs.push(useRef<Group>(null));
-  }
+  const carRefs = useRef<(THREE.Group<THREE.Object3DEventMap> | null)[]>(
+    new Array(carCount).fill(null)
+  );
 
   const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
@@ -67,7 +66,7 @@ export default function Train({
   const cameraType = useContext(CameraContext);
   updateCamera(camera, cameraType, path, progress);
 
-  const trainMidpoint = (carRefs.length / 2) - 0.5;
+  const trainMidpoint = (carCount / 2) - 0.5;
   const trackLength = useMemo(() => {
     return path.getLength();
   }, [path]);
@@ -84,19 +83,19 @@ export default function Train({
     return (updatedProgress + offsetAsFractionOfWholeTrack + maxProgress) % 1;
   }
 
-  function updatePosition(itemRef: RefObject<Group>, updatedProgress: number, offset = 0) {
-    if (!itemRef?.current) { return; }
+  function updatePosition(item: Group, updatedProgress: number, offset = 0) {
+    if (!item) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
-    itemRef.current.position.copy(path.getPointAt(offsetProgress));
+    item.position.copy(path.getPointAt(offsetProgress));
   }
   
-  function updateRotation(itemRef: RefObject<Group>, updatedProgress: number, offset = 0, path: Path) {
-    if (!itemRef.current) { return; }
+  function updateRotation(item: Group, updatedProgress: number, offset = 0, path: Path) {
+    if (!item) { return; }
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
     const tangent = path.getTangentAt(offsetProgress);
 
-    const cartCenter = itemRef.current.position.clone();
-    itemRef.current.lookAt(cartCenter.add(tangent));
+    const cartCenter = item.position.clone();
+    item.lookAt(cartCenter.add(tangent));
   }
 
   function updateSpeed(updatedProgress: number, path: Path) {
@@ -106,9 +105,9 @@ export default function Train({
     setSpeed(newSpeed);
   }
 
-  function updateCar(itemRef: RefObject<Group>, updatedProgress: number, offset: number, path: Path) {
-    updatePosition(itemRef, updatedProgress, offset);
-    updateRotation(itemRef, updatedProgress, offset, path);
+  function updateCar(item: Group, updatedProgress: number, offset: number, path: Path) {
+    updatePosition(item, updatedProgress, offset);
+    updateRotation(item, updatedProgress, offset, path);
     updateSpeed(updatedProgress, path);
   }
 
@@ -123,7 +122,8 @@ export default function Train({
     const cleanDelta = Math.min(delta, 0.033);
     const updatedProgress = getUpdatedProgress(cleanDelta);
 
-    carRefs.forEach((ref, i) => {
+    carRefs.current.forEach((ref, i) => {
+      if (!ref) { return; }
       const offset = spaceBetweenCarts * (i - trainMidpoint);
       updateCar(ref, updatedProgress, offset, path);
     });
@@ -133,8 +133,13 @@ export default function Train({
 
   return (
     <>
-      {carRefs.map((ref, i) => {
-        return (<Car carRef={ref} isFrontCar={i === carRefs.length - 1} key={i} />);
+      {carRefs.current.map((ref, i) => {
+        return (
+          <Car
+            carRef={(el) => { carRefs.current[i] = el; }}
+            isFrontCar={i === carCount - 1} key={i}
+          />
+        );
       })}
     </>
   );

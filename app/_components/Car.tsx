@@ -1,10 +1,12 @@
 import * as THREE from 'three';
-import { RefObject, useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { globalSettings } from "../_utils/globalSettings";
-import { Group } from "three";
 import { ColorContext } from '../page';
 
-export default function Car({ carRef, isFrontCar }: { carRef: RefObject<Group>, isFrontCar: boolean }) {
+export default function Car({ carRef, isFrontCar }: {
+  carRef: (el: THREE.Group<THREE.Object3DEventMap> | null) => void,
+  isFrontCar: boolean,
+}) {
   return (
     <group ref={carRef}>
       <CarModel isFrontCar={isFrontCar} />
