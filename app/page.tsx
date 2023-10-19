@@ -9,7 +9,7 @@ import startingTrackPieces from './_premadeTracks/000_starter';
 import { buildTrack } from './_utils/trackBuilder';
 import { CameraType, CoasterColors } from './_utils/types';
 import { defaultCoasterColors } from './_utils/defaults';
-import { decodeTrack, encodeTrack, stripHexHashes } from './_utils/urlHashUtils';
+import { decodeTrack, encodeTrack, stripHexHashes, updateHash } from './_utils/urlHashUtils';
 import { produce } from 'immer';
 
 const cameraSettings = {
@@ -77,7 +77,7 @@ export default function Home() {
         ...stripHexHashes(coasterColors[0]),
         p: encodeTrack(trackPieces),
       });
-      window.location.hash = params.toString();
+      updateHash(params.toString());
     }
   }, [trackPieces, coasterColors]);
 

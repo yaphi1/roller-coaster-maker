@@ -11,7 +11,9 @@
   "dependencies": {
     "@react-three/drei": "^9.88.2",
     "@react-three/fiber": "^8.14.5",
+    "@types/debounce": "^1.2.3",
     "@types/three": "^0.157.0",
+    "debounce": "^1.2.1",
     "immer": "^10.0.3",
     "next": "13.5.5",
     "react": "^18",

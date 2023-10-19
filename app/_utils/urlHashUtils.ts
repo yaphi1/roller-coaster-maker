@@ -1,4 +1,5 @@
 import { CoasterColors, PieceType } from "./types";
+import debounce from 'debounce';
 
 const trackEncodingMap: Record<PieceType, string> = {
   straight: 's',
@@ -34,3 +35,7 @@ export function decodeTrack(encodedString: string) {
   const decodedPieces = encodedString.split('').map(pieceType => trackDecodingMap[pieceType]);
   return decodedPieces;
 }
+
+export const updateHash = debounce((paramString: string) => {
+  window.location.hash = paramString;
+}, 500);
