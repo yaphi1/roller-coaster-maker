@@ -1,13 +1,16 @@
 import * as THREE from 'three';
 import { globalSettings } from '../_utils/globalSettings';
 import { useLoader, useThree } from '@react-three/fiber';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function Ground() {
   const { scene } = useThree();
   const skyTexture = useLoader(THREE.TextureLoader, '/textures/sky.jpg');
   const grassTexture = useLoader(THREE.TextureLoader, '/textures/grass.jpg'); // grass texture source: https://www.sketchuptextureclub.com/textures/nature-elements/vegetation/green-grass/artificial-green-grass-texture-seamless-13061
-  const [groundMaterial, setGroundMaterial] = useState(<meshStandardMaterial color="lightgreen" />);
+  const groundMaterial = globalSettings.isDebugMode ?
+    <meshStandardMaterial color="white" /> :
+    <meshStandardMaterial map={grassTexture} />
+  ;
 
   useEffect(() => {
     scene.background = skyTexture;
@@ -18,12 +21,6 @@ export default function Ground() {
     grassTexture.repeat.set(500, 500);
     grassTexture.wrapS = THREE.RepeatWrapping;
     grassTexture.wrapT = THREE.RepeatWrapping;
-
-    const updatedGroundMaterial = globalSettings.isDebugMode ?
-      <meshStandardMaterial color="white" /> :
-      <meshStandardMaterial map={grassTexture} />
-    ;
-    setGroundMaterial(updatedGroundMaterial);
   }, [grassTexture]);
 
   return (
