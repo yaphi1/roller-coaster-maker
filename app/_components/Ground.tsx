@@ -12,7 +12,7 @@ export default function Ground() {
   useEffect(() => {
     scene.background = skyTexture;
     skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-  }, [skyTexture]);
+  }, [scene, skyTexture]);
   
   useEffect(() => {
     grassTexture.repeat.set(500, 500);
