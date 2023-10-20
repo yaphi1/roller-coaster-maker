@@ -1,5 +1,4 @@
 # TODO:
-  - add temporary ground material if grass texture isn't loaded yet
   - clarify camera controls
   - add loop-the-loops
   - undo/redo

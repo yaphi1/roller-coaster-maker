@@ -1,35 +1,30 @@
 import * as THREE from 'three';
 import { globalSettings } from '../_utils/globalSettings';
-import { useThree } from '@react-three/fiber';
-import { useEffect, useMemo } from 'react';
-
-const textureLoader = new THREE.TextureLoader();
+import { useLoader, useThree } from '@react-three/fiber';
+import { useEffect, useState } from 'react';
 
 export default function Ground() {
-
-  const textures = useMemo(() => {
-    const skyTexture = textureLoader.load('/textures/sky.jpg');
-    const grassTexture = textureLoader.load('/textures/grass.jpg'); // grass texture source: https://www.sketchuptextureclub.com/textures/nature-elements/vegetation/green-grass/artificial-green-grass-texture-seamless-13061
-    return { skyTexture, grassTexture };
-  }, []);
+  const { scene } = useThree();
+  const skyTexture = useLoader(THREE.TextureLoader, '/textures/sky.jpg');
+  const grassTexture = useLoader(THREE.TextureLoader, '/textures/grass.jpg'); // grass texture source: https://www.sketchuptextureclub.com/textures/nature-elements/vegetation/green-grass/artificial-green-grass-texture-seamless-13061
+  const [groundMaterial, setGroundMaterial] = useState(<meshStandardMaterial color="lightgreen" />);
 
   useEffect(() => {
-    const { skyTexture, grassTexture } = textures;
-
+    scene.background = skyTexture;
     skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-
+  }, [skyTexture]);
+  
+  useEffect(() => {
     grassTexture.repeat.set(500, 500);
     grassTexture.wrapS = THREE.RepeatWrapping;
     grassTexture.wrapT = THREE.RepeatWrapping;
-  }, [textures]);
 
-  const { scene } = useThree();
-  scene.background = textures.skyTexture;
-
-  const groundMaterial = globalSettings.isDebugMode ?
-    <meshStandardMaterial color="white" /> :
-    <meshStandardMaterial map={textures.grassTexture} />
-  ;
+    const updatedGroundMaterial = globalSettings.isDebugMode ?
+      <meshStandardMaterial color="white" /> :
+      <meshStandardMaterial map={grassTexture} />
+    ;
+    setGroundMaterial(updatedGroundMaterial);
+  }, [grassTexture]);
 
   return (
     <>
