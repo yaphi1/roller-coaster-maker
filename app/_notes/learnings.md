@@ -41,3 +41,9 @@ Refs can't be set in a loop since useRef hooks need to run in a guaranteed order
 
 Don't overuse refs! If it can be expressed as a prop, don't use a ref.
   - Source: https://react.dev/reference/react/forwardRef (cmd + f "Pitfalls")
+
+Use setFromUnitVectors when you want to set a rotation in a direction easily
+  Example:
+    var quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
+		var quatInverse = quat.clone().inverse();
+    Source: https://jsfiddle.net/t2exac47/
