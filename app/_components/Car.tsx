@@ -1,14 +1,21 @@
 import * as THREE from 'three';
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo, useRef } from "react";
 import { globalSettings } from "../_utils/globalSettings";
 import { ColorContext } from './App';
 
-export default function Car({ carRef, isFrontCar }: {
-  carRef: (el: THREE.Group<THREE.Object3DEventMap> | null) => void,
+export default function Car({ position, rotationTarget, isFrontCar }: {
+  position: THREE.Vector3
+  rotationTarget: THREE.Vector3
   isFrontCar: boolean,
 }) {
+  const carRef = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
+
+  useEffect(() => {
+    carRef.current?.lookAt(rotationTarget);
+  }, [rotationTarget]);
+
   return (
-    <group ref={carRef}>
+    <group ref={carRef} position={position}>
       <CarModel isFrontCar={isFrontCar} />
     </group>
   );

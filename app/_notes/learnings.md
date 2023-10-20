@@ -24,6 +24,7 @@ Hooks shouldn't be conditionally added to a function or else you'll get errors.
 
 Remember to use useMemo if you want a similar situation to useEffect but you want the resulting values to be available outside the hook.
   - But if it requires an external call or a wait for something to load, use useEffect and then setState
+  - Update: I've been misusing useMemo when I really want a useEffect + setState combo
 
 If you want a list of object keys to be their own type, you can do something like this:
   ```javascript
@@ -35,3 +36,8 @@ If you want a list of object keys to be their own type, you can do something lik
 In three.js, a 3d object's lookAt treats the negative z-axis as the face of the object.
   - Easy way to remember this: negative z is forward from my viewpoint as a user
   - The default .up value is the positive y axis
+
+Refs can't be set in a loop since useRef hooks need to run in a guaranteed order. To set refs dynamically in a loop, use one ref with an array inside.
+
+Don't overuse refs! If it can be expressed as a prop, don't use a ref.
+  - Source: https://react.dev/reference/react/forwardRef (cmd + f "Pitfalls")

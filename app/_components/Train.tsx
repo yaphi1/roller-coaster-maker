@@ -3,46 +3,16 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
 import { Group } from "three";
-import { CameraType, Path } from "../_utils/types";
+import { Path } from "../_utils/types";
 import { CameraContext } from './App';
+import { updateCamera } from '../_utils/cameraHelpers';
+import { produce } from 'immer';
 
 const stopForDebugging = false;
 
 const minSpeed = stopForDebugging ? 0 : 3;
 const gravityStrength = 0.5;
 const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
-
-function updateCamera(camera: THREE.Camera & { manual?: boolean | undefined; }, cameraType: CameraType | null, path: Path, progress:number) {
-  if (!cameraType || cameraType === 'orbital') { return; }
-
-  const coasterPosition = path.getPointAt(progress);
-
-  if (cameraType === 'coasterFocus') {
-    const cameraPosition = new THREE.Vector3(
-      coasterPosition.x + 7,
-      coasterPosition.y + 10,
-      coasterPosition.z + 20,
-    );
-    camera.position.copy(cameraPosition);
-    camera.lookAt(coasterPosition);
-  }
-  
-  if (cameraType === 'firstPerson') {
-    const tangent = path.getTangentAt(progress);
-    const cameraPosition = new THREE.Vector3(
-      coasterPosition.x,
-      coasterPosition.y + 2,
-      coasterPosition.z,
-    );
-    const cameraDirection = new THREE.Vector3(
-      tangent.x,
-      tangent.y - 0.2,
-      tangent.z,
-    );
-    camera.position.copy(cameraPosition);
-    camera.lookAt(cameraPosition.add(cameraDirection));
-  }
-}
 
 export default function Train({
   path,
@@ -55,10 +25,9 @@ export default function Train({
   spaceBetweenCarts?: number,
   startingProgress?: number,
 }) {
-  const carRefs = useRef<(THREE.Group<THREE.Object3DEventMap> | null)[]>(
-    new Array(carCount).fill(null)
-  );
-
+  const zeroVectors: THREE.Vector3[] = new Array(carCount).fill(new THREE.Vector3());
+  const [carPositions, setCarPositions] = useState(zeroVectors);
+  const [carRotationTargets, setCarRotationTargets] = useState(zeroVectors);
   const [progress, setProgress] = useState(startingProgress);
   const [speed, setSpeed] = useState(10);
 
@@ -83,19 +52,23 @@ export default function Train({
     return (updatedProgress + offsetAsFractionOfWholeTrack + maxProgress) % 1;
   }
 
-  function updatePosition(item: Group, updatedProgress: number, offset = 0) {
-    if (!item) { return; }
+  function updatePosition(carIndex: number, updatedProgress: number, offset = 0) {
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
-    item.position.copy(path.getPointAt(offsetProgress));
+    const newPosition = path.getPointAt(offsetProgress);
+    setCarPositions(produce((draft) => {
+      draft[carIndex] = newPosition;
+    }));
   }
   
-  function updateRotation(item: Group, updatedProgress: number, offset = 0, path: Path) {
-    if (!item) { return; }
+  function updateRotationTarget(carIndex: number, updatedProgress: number, offset = 0, path: Path) {
     const offsetProgress = getOffsetProgress(updatedProgress, offset);
     const tangent = path.getTangentAt(offsetProgress);
+    const cartCenter = carPositions[carIndex].clone();
+    const rotationTarget = cartCenter.add(tangent);
 
-    const cartCenter = item.position.clone();
-    item.lookAt(cartCenter.add(tangent));
+    setCarRotationTargets(produce((draft) => {
+      draft[carIndex] = rotationTarget;
+    }));
   }
 
   function updateSpeed(updatedProgress: number, path: Path) {
@@ -105,9 +78,9 @@ export default function Train({
     setSpeed(newSpeed);
   }
 
-  function updateCar(item: Group, updatedProgress: number, offset: number, path: Path) {
-    updatePosition(item, updatedProgress, offset);
-    updateRotation(item, updatedProgress, offset, path);
+  function updateCar(carIndex: number, updatedProgress: number, offset: number, path: Path) {
+    updatePosition(carIndex, updatedProgress, offset);
+    updateRotationTarget(carIndex, updatedProgress, offset, path);
     updateSpeed(updatedProgress, path);
   }
 
@@ -122,10 +95,9 @@ export default function Train({
     const cleanDelta = Math.min(delta, 0.033);
     const updatedProgress = getUpdatedProgress(cleanDelta);
 
-    carRefs.current.forEach((ref, i) => {
-      if (!ref) { return; }
-      const offset = spaceBetweenCarts * (i - trainMidpoint);
-      updateCar(ref, updatedProgress, offset, path);
+    carPositions.forEach((_, carIndex) => {
+      const offset = spaceBetweenCarts * (carIndex - trainMidpoint);
+      updateCar(carIndex, updatedProgress, offset, path);
     });
 
     setProgress(updatedProgress);
@@ -133,11 +105,13 @@ export default function Train({
 
   return (
     <>
-      {carRefs.current.map((ref, i) => {
+      {carPositions.map((carPosition, carIndex) => {
         return (
           <Car
-            carRef={(el) => { carRefs.current[i] = el; }}
-            isFrontCar={i === carCount - 1} key={i}
+            key={carIndex}
+            position={carPosition}
+            rotationTarget={carRotationTargets[carIndex]}
+            isFrontCar={carIndex === carCount - 1}
           />
         );
       })}
