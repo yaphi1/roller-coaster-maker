@@ -82,7 +82,7 @@ export default function App() {
     }
   }, [trackPieces, coasterColors]);
   
-  useLayoutEffect(() => {
+  useEffect(() => {
     const tracks = [
       {
         startPoint: { x: 0, y: 0.3, z: 0 },

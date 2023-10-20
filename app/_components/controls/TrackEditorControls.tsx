@@ -10,29 +10,20 @@ export default function TrackEditorControls(
     builtTracks: Track[],
   }
 ) {
-  // const builtTrack = builtTracks[0];
-
-  // if(!builtTrack) {
-  //   return <></>;
-  // }
-
   const [builtTrack, setBuiltTrack] = useState<Track | undefined>();
-  const [latestPiece, setLatestPiece] = useState<Piece | undefined>();
   const [isMinTrackSize, setIsMinTrackSize] = useState<boolean>(false);
+  const [isRendering, setIsRendering] = useState(true);
 
   useEffect(() => {
     setBuiltTrack(builtTracks[0]);
+    setIsRendering(false);
   }, [builtTracks]);
-  
-  useEffect(() => {
-    setLatestPiece(getLatestPiece(builtTrack));
-  }, [builtTrack]);
 
   useEffect(() => {
     setIsMinTrackSize(trackPieces.length <= 3);
   }, [trackPieces]);
 
-  if(!builtTrack || !trackPieces || !latestPiece) {
+  if(!builtTrack || !trackPieces) {
     return <></>;
   }
 
@@ -46,9 +37,14 @@ export default function TrackEditorControls(
           <button
             className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
             onClick={() => {
-              setTrackPieces([...trackPieces, getNextForwardPiece(latestPiece)]);
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, getNextForwardPiece(getLatestPiece(builtTrack))]);
             }}
-            disabled={isPieceBlocked(getNextForwardPiece(latestPiece), builtTrack)}
+            disabled={isPieceBlocked(
+              getNextForwardPiece(getLatestPiece(builtTrack)),
+              builtTrack
+            )}
           >
             Forward
           </button>
@@ -56,6 +52,8 @@ export default function TrackEditorControls(
           <button
             className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
             onClick={() => {
+              if (isRendering) { return; }
+              setIsRendering(true);
               const copyOfPieces = [...trackPieces];
               copyOfPieces.pop();
               setTrackPieces(copyOfPieces);
@@ -67,16 +65,24 @@ export default function TrackEditorControls(
 
           <button
             className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-            onClick={() => { setTrackPieces([...trackPieces, 'left']); }}
-            disabled={isSloping(latestPiece) || isPieceBlocked('left', builtTrack)}
+            onClick={() => {
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, 'left']);
+            }}
+            disabled={isSloping(getLatestPiece(builtTrack)) || isPieceBlocked('left', builtTrack)}
           >
             Left
           </button>
 
           <button
             className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-            onClick={() => { setTrackPieces([...trackPieces, 'right']); }}
-            disabled={isSloping(latestPiece) || isPieceBlocked('right', builtTrack)}
+            onClick={() => {
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, 'right']);
+            }}
+            disabled={isSloping(getLatestPiece(builtTrack)) || isPieceBlocked('right', builtTrack)}
           >
             Right
           </button>
@@ -84,9 +90,11 @@ export default function TrackEditorControls(
           <button
             className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
             onClick={() => {
-              setTrackPieces([...trackPieces, getNextUpPiece(latestPiece)]);
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, getNextUpPiece(getLatestPiece(builtTrack))]);
             }}
-            disabled={isPieceBlocked(getNextUpPiece(latestPiece), builtTrack)}
+            disabled={isPieceBlocked(getNextUpPiece(getLatestPiece(builtTrack)), builtTrack)}
           >
             Up
           </button>
@@ -94,14 +102,14 @@ export default function TrackEditorControls(
           <button
             className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
             onClick={() => {
-              setTrackPieces([...trackPieces, getNextDownPiece(latestPiece)]);
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, getNextDownPiece(getLatestPiece(builtTrack))]);
             }}
-            disabled={isAtBottom(latestPiece) || isPieceBlocked(getNextDownPiece(latestPiece), builtTrack)}
+            disabled={isAtBottom(getLatestPiece(builtTrack)) || isPieceBlocked(getNextDownPiece(getLatestPiece(builtTrack)), builtTrack)}
           >
             Down
           </button>
-
-          {/* <button className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50">Play</button> */}
         </div>
       </div>
     </>
@@ -218,8 +226,7 @@ function getCollisionZone(potentialPiece: Piece, nextStartPoint: XYZ, nextDirect
   return collisionZone;
 }
 
-function getLatestPiece(builtTrack: Track | null | undefined) {
-  if (!builtTrack) { return; }
+function getLatestPiece(builtTrack: Track) {
   const { pieces } = builtTrack;
   const latestPieceIndex = pieces.length - 1;
   return pieces[latestPieceIndex];
