@@ -1,8 +1,11 @@
 # TODO:
-  - undo/redo
+  - add temporary ground material if grass texture isn't loaded yet
+  - clarify camera controls
+    - also add more guards (e.g. disallow panning through the ground)
   - add loop-the-loops
+  - undo/redo
   - add other pieces: station, chain lift
-  - allow multiple coasters
+  - allow multiple coasters? (maybe not, now that shareable urls are tied to one coaster)
   - use tile-based collision to enable other roller coasters, paths, etc
 
 
