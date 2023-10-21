@@ -20,7 +20,10 @@ const cameraSettings = {
   // zoom: 100,
 };
 
-export const CameraContext = createContext<CameraType | null>(null);
+export const CameraContext = createContext<{
+  cameraType: CameraType;
+  setCameraType: Dispatch<SetStateAction<CameraType>>
+} | null>(null);
 
 export const ColorContext = createContext<{
   coasterColors: CoasterColors[];
@@ -105,20 +108,19 @@ export default function App() {
       <CoasterContext.Provider value={{ isRunning, setIsRunning }}>
         <ModalContext.Provider value={{ currentModal, setCurrentModal }}>
           <ColorContext.Provider value={{ coasterColors, setCoasterColors }}>
-            <CameraContext.Provider value={cameraType}>
+            <CameraContext.Provider value={{ cameraType, setCameraType }}>
               <Canvas
                 camera={cameraSettings}
                 // orthographic
               >
                 <Experience builtTracks={builtTracks} cameraType={cameraType} />
               </Canvas>
+              <Controls
+                trackPieces={trackPieces}
+                builtTracks={builtTracks}
+                setTrackPieces={setTrackPieces}
+              />
             </CameraContext.Provider>
-            <Controls
-              trackPieces={trackPieces}
-              builtTracks={builtTracks}
-              setTrackPieces={setTrackPieces}
-              setCameraType={setCameraType}
-            />
           </ColorContext.Provider>
         </ModalContext.Provider>
       </CoasterContext.Provider>

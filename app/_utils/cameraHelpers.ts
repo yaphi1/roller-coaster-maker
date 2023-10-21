@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CameraType, Path } from './types';
 
-export function updateCamera(camera: THREE.Camera & { manual?: boolean | undefined; }, cameraType: CameraType | null, path: Path, progress:number) {
+export function updateCamera(camera: THREE.Camera & { manual?: boolean | undefined; }, cameraType: CameraType | undefined, path: Path, progress:number) {
   if (!cameraType || cameraType === 'orbital') { return; }
 
   const coasterPosition = path.getPointAt(progress);

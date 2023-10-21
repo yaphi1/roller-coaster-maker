@@ -152,7 +152,7 @@ function isPieceBlocked(pieceType: PieceType | undefined, builtTrack: Track) {
   }
 
   // We're checking everything BEFORE the latest piece because otherwise
-  // the next piece will register a collision with the previous piece
+  // the next piece will register a collision with the latest piece
   // because, of course, it's connected to it!
   const numPointsBeforeLatestPiece = trackPathPoints.length - desiredPointsPerTrackPiece;
 

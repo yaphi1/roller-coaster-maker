@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { useFrame, useThree } from "@react-three/fiber";
 import { useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
-import { Group } from "three";
 import { Path } from "../_utils/types";
 import { CameraContext } from './App';
 import { updateCamera } from '../_utils/cameraHelpers';
@@ -32,8 +31,8 @@ export default function Train({
   const [speed, setSpeed] = useState(10);
 
   const camera = useThree().camera;
-  const cameraType = useContext(CameraContext);
-  updateCamera(camera, cameraType, path, progress);
+  const cameraContext = useContext(CameraContext);
+  updateCamera(camera, cameraContext?.cameraType, path, progress);
 
   const trainMidpoint = (carCount / 2) - 0.5;
   const trackLength = useMemo(() => {

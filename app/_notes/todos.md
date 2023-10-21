@@ -1,6 +1,6 @@
 # TODO:
-  - clarify camera controls
   - add loop-the-loops
+  - add url param validation
   - undo/redo
   - add other pieces: station, chain lift
   - allow multiple coasters? (maybe not, now that shareable urls are tied to one coaster)
