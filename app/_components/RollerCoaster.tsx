@@ -1,6 +1,6 @@
 import Train from './Train';
-import { Track } from '../_utils/types';
-import { globalSettings } from '../_utils/globalSettings';
+import { Track } from '../_scripts/types';
+import { globalSettings } from '../_scripts/globalSettings';
 import PathDebugger from './PathDebugger';
 import { useContext } from 'react';
 import { CoasterContext } from './App';

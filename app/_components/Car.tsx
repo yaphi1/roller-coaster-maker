@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useContext, useEffect, useMemo, useRef } from "react";
-import { globalSettings } from "../_utils/globalSettings";
+import { globalSettings } from "../_scripts/globalSettings";
 import { ColorContext } from './App';
 
 export default function Car({ position, rotationTarget, isFrontCar }: {

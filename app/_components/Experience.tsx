@@ -1,8 +1,8 @@
 import { OrbitControls } from '@react-three/drei';
 import RollerCoaster from './RollerCoaster';
-import { globalSettings } from '../_utils/globalSettings';
+import { globalSettings } from '../_scripts/globalSettings';
 import Ground from './Ground';
-import { Track, CameraType } from '../_utils/types';
+import { Track, CameraType } from '../_scripts/types';
 
 export default function Experience({ builtTracks, cameraType }: {
   builtTracks: Track[],

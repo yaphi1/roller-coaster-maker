@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { globalSettings } from '../_utils/globalSettings';
+import { globalSettings } from '../_scripts/globalSettings';
 import { useLoader, useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 

@@ -1,4 +1,4 @@
-import { ColorableItem } from "@/app/_utils/types";
+import { ColorableItem } from "@/app/_scripts/types";
 import { ColorContext } from "../App";
 import { produce } from "immer";
 import { useContext } from "react";

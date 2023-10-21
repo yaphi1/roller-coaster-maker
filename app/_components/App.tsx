@@ -6,10 +6,10 @@ import Experience from './Experience';
 import Controls from './controls/Controls';
 import { Dispatch, SetStateAction, createContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import startingTrackPieces from '../_premadeTracks/000_starter';
-import { buildTrack } from '../_utils/trackBuilder';
-import { CameraType, CoasterColors, Track } from '../_utils/types';
-import { defaultCoasterColors } from '../_utils/defaults';
-import { decodeTrack, encodeTrack, stripHexHashes, updateHash } from '../_utils/urlHashUtils';
+import { buildTrack } from '../_scripts/trackBuilder/buildTrack';
+import { CameraType, CoasterColors, Track } from '../_scripts/types';
+import { defaultCoasterColors } from '../_scripts/defaults';
+import { decodeTrack, encodeTrack, stripHexHashes, updateHash } from '../_scripts/urlHashUtils';
 import { produce } from 'immer';
 
 const cameraSettings = {

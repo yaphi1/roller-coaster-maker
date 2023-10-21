@@ -1,4 +1,4 @@
-import { PieceType } from "../_utils/types";
+import { PieceType } from "../_scripts/types";
 
 const track: PieceType[] = [
   'straight',

@@ -1,4 +1,4 @@
-import { PieceType } from "@/app/_utils/types";
+import { PieceType } from "@/app/_scripts/types";
 import { Dispatch, SetStateAction } from "react";
 import starter from '@/app/_premadeTracks/000_starter';
 import twoHills from '@/app/_premadeTracks/001_two_hills';

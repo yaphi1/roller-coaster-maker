@@ -1,7 +1,7 @@
 import { ColorContext } from '../App';
 import { useContext } from "react";
 import { produce } from 'immer';
-import { defaultCoasterColors } from "@/app/_utils/defaults";
+import { defaultCoasterColors } from "@/app/_scripts/defaults";
 import ColorButton from "./ColorButton";
 
 export default function ColorControls() {

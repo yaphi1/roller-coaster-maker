@@ -1,4 +1,4 @@
-import { globalSettings } from "@/app/_utils/globalSettings";
+import { globalSettings } from "@/app/_scripts/globalSettings";
 import { CoasterContext } from "../App";
 import { useContext, useEffect, useState } from "react";
 

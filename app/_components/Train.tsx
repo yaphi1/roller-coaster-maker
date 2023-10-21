@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import { useFrame, useThree } from "@react-three/fiber";
 import { useContext, useMemo, useRef, useState } from "react";
 import Car from './Car';
-import { Path } from "../_utils/types";
+import { Path } from "../_scripts/types";
 import { CameraContext } from './App';
-import { updateCamera } from '../_utils/cameraHelpers';
+import { updateCamera } from '../_scripts/cameraHelpers';
 import { produce } from 'immer';
 
 const stopForDebugging = false;

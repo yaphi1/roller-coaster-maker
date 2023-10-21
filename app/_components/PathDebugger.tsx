@@ -1,4 +1,4 @@
-import { Path } from "../_utils/types";
+import { Path } from "../_scripts/types";
 import { Line } from "@react-three/drei";
 
 export default function PathDebugger({ path } : { path: Path }) {

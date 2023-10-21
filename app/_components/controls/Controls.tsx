@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { PieceType, Track } from "../../_utils/types";
+import { PieceType, Track } from "../../_scripts/types";
 import CameraControls from "./CameraControls";
 import TrackEditorControls from "./TrackEditorControls";
 import PresetControls from "./PresetControls";

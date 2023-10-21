@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { CollisionZone, Piece, PieceType, Track, XYZ } from "@/app/_utils/types";
-import { buildPiece, desiredPointsPerTrackPiece, getPathPoints, trackWidth } from "@/app/_utils/trackBuilder";
+import { CollisionZone, Piece, PieceType, Track, XYZ } from "@/app/_scripts/types";
+import { buildPiece } from "@/app/_scripts/trackBuilder/trackPieceBuilders/buildPiece";
+import { getPathPoints } from "@/app/_scripts/trackBuilder/trackPieceBuilders/getPathPoints";
+import { desiredPointsPerTrackPiece, trackWidth } from "@/app/_scripts/trackBuilder/trackConstants";
 
 export default function TrackEditorControls(
   { trackPieces, setTrackPieces, builtTracks }:
