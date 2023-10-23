@@ -7,6 +7,8 @@ const trackEncodingMap: Record<PieceType, string> = {
   left: 'l',
   up: 'u',
   down: 'd',
+  loop_left: 'o',
+  loop_right: 'p',
 };
 
 const trackDecodingMap = (() => {
