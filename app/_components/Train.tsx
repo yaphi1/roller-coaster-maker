@@ -33,7 +33,7 @@ export default function Train({
 
   const camera = useThree().camera;
   const cameraContext = useContext(CameraContext);
-  updateCamera(camera, cameraContext?.cameraType, path, progress);
+  updateCamera(camera, cameraContext?.cameraType, path, progress, upwardVectors);
 
   const trainMidpoint = (carCount / 2) - 0.5;
   const trackLength = useMemo(() => {

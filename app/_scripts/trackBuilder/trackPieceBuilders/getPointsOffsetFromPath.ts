@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import { Path } from "../../types";
 import { desiredLengthBetweenPathPoints } from "../trackConstants";
 
-export function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offsetVertical = 0) {
-  const pointsCount = Math.ceil(path.getLength() / desiredLengthBetweenPathPoints);
+export function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offsetVertical = 0, pointsMultiplier = 1) {
+  const standardPointsCount = Math.ceil(path.getLength() / desiredLengthBetweenPathPoints);
+  const pointsCount = Math.ceil(pointsMultiplier * standardPointsCount);
   const points = path.getSpacedPoints(pointsCount);
 
   // For each of n points along the curve a Frenet Frame gives:
