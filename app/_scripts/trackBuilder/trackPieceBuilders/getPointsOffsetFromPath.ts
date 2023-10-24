@@ -42,6 +42,8 @@ export function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offset
 // so cars can easily orient themselves
 function flattenHorizontalPerpendiculars(horizontalPerpendiculars: THREE.Vector3[]): THREE.Vector3[] {
   return horizontalPerpendiculars.map(perp => {
-    return new THREE.Vector3(perp.x, 0, perp.z);
+    const originalLength = perp.length();
+    const flattenedVector = new THREE.Vector3(perp.x, 0, perp.z);
+    return flattenedVector.setLength(originalLength);
   });
 }
