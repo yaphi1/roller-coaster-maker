@@ -18,7 +18,7 @@ export default function Car({ progress, position, rotationTarget, upwardVectors,
     if (!carRef.current) { return; }
     carRef.current.up = upwardVector;
     carRef.current.lookAt(rotationTarget);
-  }, [rotationTarget]);
+  }, [progress, rotationTarget, upwardVectors]);
 
   return (
     <group ref={carRef} position={position}>
