@@ -4,7 +4,7 @@ export type XYZ = {
   z: number;
 };
 
-export type PieceType = 'straight' | 'right' | 'left' | 'up' | 'down';
+export type PieceType = 'straight' | 'right' | 'left' | 'up' | 'down' | 'loop_left' | 'loop_right';
 export type TurnDirection = 'right' | 'left';
 export type RampDirection = 'up' | 'down';
 
@@ -17,6 +17,7 @@ export type Piece = {
   direction: XYZ;
   nextDirection: XYZ;
   trackPieceVisual: () => JSX.Element;
+  upwardVectors: THREE.Vector3[];
 };
 
 export type PathVisual = ((() => JSX.Element) | undefined);
@@ -24,7 +25,8 @@ export type PathVisual = ((() => JSX.Element) | undefined);
 export type Track = {
   path: Path;
   visuals: PathVisual[];
-  pieces: Piece[],
+  pieces: Piece[];
+  upwardVectors: THREE.Vector3[];
 };
 
 export type CollisionZone = {

@@ -1,5 +1,4 @@
 # TODO:
-  - add loop-the-loops
   - add url param validation
   - undo/redo
   - add other pieces: station, chain lift

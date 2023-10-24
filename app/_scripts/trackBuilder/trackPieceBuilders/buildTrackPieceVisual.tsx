@@ -1,13 +1,13 @@
 import * as THREE from 'three';
-import { Path } from "../../types";
+import { Path, PieceType } from "../../types";
 import { trackPieceDepth, trackWidth } from "../trackConstants";
 import { getPointsOffsetFromPath } from "./getPointsOffsetFromPath";
 import { useContext } from 'react';
 import { ColorContext } from '@/app/_components/App';
 import { globalSettings } from '../../globalSettings';
 
-export function buildTrackPieceVisual(path: Path) {
-  const tubularSegments = 20;
+export function buildTrackPieceVisual(path: Path, pieceType: PieceType = 'straight') {
+  const tubularSegments = getTubularSegments(pieceType);
   const radius = 0.1;
   const radialSegments = 8;
 
@@ -42,7 +42,7 @@ export function buildTrackPieceVisual(path: Path) {
       <>
         {crossPiecePaths.map((crossPiecePath, i) => (
           <mesh key={i}>
-            <tubeGeometry args={[crossPiecePath, tubularSegments, 0.05, radialSegments]} />
+            <tubeGeometry args={[crossPiecePath, 2, 0.05, radialSegments]} />
             {material}
           </mesh>
         ))}
@@ -68,6 +68,14 @@ export function buildTrackPieceVisual(path: Path) {
   };
 
   return TrackPieceVisual;
+}
+
+function getTubularSegments(pieceType: PieceType) {
+  if (pieceType === 'straight') { return 1; }
+  if (pieceType === 'left' || pieceType === 'right') { return 20; }
+  if (pieceType === 'up' || pieceType === 'down') { return 20; }
+  if (pieceType === 'loop_left' || pieceType === 'loop_right') { return 80; }
+  return 20;
 }
 
 function getRailPaths(path: Path, horizontalOffset = trackWidth / 2) {

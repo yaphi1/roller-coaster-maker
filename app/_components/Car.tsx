@@ -2,17 +2,23 @@ import * as THREE from 'three';
 import { useContext, useEffect, useMemo, useRef } from "react";
 import { globalSettings } from "../_scripts/globalSettings";
 import { ColorContext } from './App';
+import { getUpwardVectorFromProgress } from '../_scripts/trackBuilder/trackPieceBuilders/upwardVectorHelpers';
 
-export default function Car({ position, rotationTarget, isFrontCar }: {
-  position: THREE.Vector3
-  rotationTarget: THREE.Vector3
+export default function Car({ progress, position, rotationTarget, upwardVectors, isFrontCar }: {
+  progress: number,
+  position: THREE.Vector3,
+  rotationTarget: THREE.Vector3,
+  upwardVectors: THREE.Vector3[],
   isFrontCar: boolean,
 }) {
   const carRef = useRef<THREE.Group<THREE.Object3DEventMap>>(null);
 
   useEffect(() => {
-    carRef.current?.lookAt(rotationTarget);
-  }, [rotationTarget]);
+    const upwardVector = getUpwardVectorFromProgress(progress, upwardVectors);
+    if (!carRef.current) { return; }
+    carRef.current.up = upwardVector;
+    carRef.current.lookAt(rotationTarget);
+  }, [progress, rotationTarget, upwardVectors]);
 
   return (
     <group ref={carRef} position={position}>

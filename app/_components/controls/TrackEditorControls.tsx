@@ -112,6 +112,30 @@ export default function TrackEditorControls(
           >
             Down
           </button>
+
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => {
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, 'loop_left']);
+            }}
+            disabled={isSloping(getLatestPiece(builtTrack)) || isPieceBlocked('loop_left', builtTrack)}
+          >
+            Loop L
+          </button>
+          
+          <button
+            className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+            onClick={() => {
+              if (isRendering) { return; }
+              setIsRendering(true);
+              setTrackPieces([...trackPieces, 'loop_right']);
+            }}
+            disabled={isSloping(getLatestPiece(builtTrack)) || isPieceBlocked('loop_right', builtTrack)}
+          >
+            Loop R
+          </button>
         </div>
       </div>
     </>

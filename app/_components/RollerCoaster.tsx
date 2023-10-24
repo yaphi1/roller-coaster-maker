@@ -15,7 +15,7 @@ export default function RollerCoaster({ track }: { track: Track }) {
         return (<TrackPiece key={i} />);
       })}
 
-      {coasterContext?.isRunning && <Train path={track.path} />}
+      {coasterContext?.isRunning && <Train track={track} />}
       {globalSettings.isDebugMode && <PathDebugger path={track.path} />}
     </>
   );
