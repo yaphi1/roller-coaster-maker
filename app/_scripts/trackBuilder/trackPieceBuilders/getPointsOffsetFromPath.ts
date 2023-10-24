@@ -18,7 +18,7 @@ export function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offset
 
   const isVerticalOffsetReversed = frenetFrames[verticalVectors][0].y < 0;
 
-  const horizontalPerpendiculars = frenetFrames[horizontalVectors];
+  const horizontalPerpendiculars = flattenHorizontalPerpendiculars(frenetFrames[horizontalVectors]);
   const verticalPerpendiculars = frenetFrames[verticalVectors];
   const offsetVerticalCorrected = isVerticalOffsetReversed ? -offsetVertical : offsetVertical;
 
@@ -34,4 +34,14 @@ export function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offset
   });
 
   return offsetPoints;
+}
+
+// Avoid unwanted track warping, mainly in loops
+// Update y to get banked turns later
+// Also consider sending an array of Frenet vectors
+// so cars can easily orient themselves
+function flattenHorizontalPerpendiculars(horizontalPerpendiculars: THREE.Vector3[]): THREE.Vector3[] {
+  return horizontalPerpendiculars.map(perp => {
+    return new THREE.Vector3(perp.x, 0, perp.z);
+  });
 }

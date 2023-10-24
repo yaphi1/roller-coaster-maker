@@ -32,7 +32,7 @@ export function buildTurnPiece(startPoint: XYZ, direction: XYZ, turnDirection: T
     endPoint,
     direction,
     nextDirection,
-    trackPieceVisual: buildTrackPieceVisual(path),
+    trackPieceVisual: buildTrackPieceVisual(path, turnDirection),
     upwardVectors: buildUpwardVectors(path),
   };
 }

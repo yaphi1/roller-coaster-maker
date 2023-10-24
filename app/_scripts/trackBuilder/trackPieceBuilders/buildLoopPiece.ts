@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Path, Piece, TurnDirection, XYZ } from "../../types";
+import { Path, Piece, PieceType, TurnDirection, XYZ } from "../../types";
 import { straightawayLength } from "../trackConstants";
 import { buildTrackPieceVisual } from './buildTrackPieceVisual';
 import { buildUpwardVectors } from './upwardVectorHelpers';
@@ -9,7 +9,7 @@ const loopHeight = straightawayLength * 2.3;
 const loopRadiusRelative = 0.8;
 
 export function buildLoopPiece(startPoint: XYZ, direction: XYZ, loopDirection: TurnDirection): Piece {
-
+  const pieceType: PieceType = `loop_${loopDirection}`;
   const endPoint = getLoopEndPoint(startPoint, direction, loopDirection);
 
   const path = getLoopPath(startPoint, endPoint, direction);
@@ -25,7 +25,7 @@ export function buildLoopPiece(startPoint: XYZ, direction: XYZ, loopDirection: T
     endPoint,
     direction,
     nextDirection: { ...direction },
-    trackPieceVisual: buildTrackPieceVisual(path),
+    trackPieceVisual: buildTrackPieceVisual(path, pieceType),
     upwardVectors,
   };
 }

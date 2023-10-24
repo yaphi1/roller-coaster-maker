@@ -22,7 +22,7 @@ export function buildStraightPiece(startPoint: XYZ, direction: XYZ): Piece {
     endPoint,
     direction,
     nextDirection: direction,
-    trackPieceVisual: buildTrackPieceVisual(path),
+    trackPieceVisual: buildTrackPieceVisual(path, 'straight'),
     upwardVectors: buildUpwardVectors(path),
   };
 }

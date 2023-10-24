@@ -43,7 +43,7 @@ export function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: R
     endPoint,
     direction,
     nextDirection,
-    trackPieceVisual: buildTrackPieceVisual(path),
+    trackPieceVisual: buildTrackPieceVisual(path, rampDirection),
     upwardVectors: buildUpwardVectors(path),
   };
 }

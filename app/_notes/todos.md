@@ -1,8 +1,10 @@
 # TODO:
   - add loop-the-loops
-    - compute upward vectors
-    - smooth the loops
-    - flatten the loop endings
+    - [done] compute upward vectors
+    - [done] smooth the loops
+    - [done] flatten the loop endings
+    - try to get flattened end of loop to match up a bit better width-wise
+    - make the first-person camera use upward vectors
   - add url param validation
   - undo/redo
   - add other pieces: station, chain lift
