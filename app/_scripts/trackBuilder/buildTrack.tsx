@@ -23,6 +23,7 @@ export function buildTrack({
   const trackPath: Path = new THREE.CurvePath();
   const visuals: PathVisual[] = [];
   const pieces: Piece[] = [];
+  const upwardVectors: THREE.Vector3[] = [];
 
   pieceTypes.forEach(pieceType => {
     const piece = buildPiece(pieceType, startPoint, direction);
@@ -32,6 +33,7 @@ export function buildTrack({
     direction = piece.nextDirection;
 
     visuals.push(piece.trackPieceVisual);
+    upwardVectors.push(...piece.upwardVectors);
   });
 
   const trackSupports = buildTrackSupports(trackPath);
@@ -41,5 +43,6 @@ export function buildTrack({
     path: trackPath,
     visuals,
     pieces,
+    upwardVectors,
   }
 }

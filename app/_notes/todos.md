@@ -1,5 +1,8 @@
 # TODO:
   - add loop-the-loops
+    - compute upward vectors
+    - smooth the loops
+    - flatten the loop endings
   - add url param validation
   - undo/redo
   - add other pieces: station, chain lift

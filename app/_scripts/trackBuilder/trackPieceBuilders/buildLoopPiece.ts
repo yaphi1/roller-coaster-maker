@@ -2,15 +2,70 @@ import * as THREE from 'three';
 import { Path, Piece, TurnDirection, XYZ } from "../../types";
 import { straightawayLength } from "../trackConstants";
 import { buildTrackPieceVisual } from './buildTrackPieceVisual';
+import { buildUpwardVectors } from './upwardVectorHelpers';
 
 const loopLength = straightawayLength * 4;
 const loopHeight = straightawayLength * 2.3;
 const loopRadiusRelative = 0.8;
 
 export function buildLoopPiece(startPoint: XYZ, direction: XYZ, loopDirection: TurnDirection): Piece {
-  const { x, y, z } = startPoint;
 
   const endPoint = getLoopEndPoint(startPoint, direction, loopDirection);
+
+  const path = getLoopPath(startPoint, endPoint, direction);
+
+  const isForUpwardVectors = true;
+  const pathForUpwardVectors = getLoopPath(startPoint, endPoint, direction, isForUpwardVectors);
+
+  const upwardVectors = buildUpwardVectors(pathForUpwardVectors);
+
+  return {
+    path,
+    startPoint,
+    endPoint,
+    direction,
+    nextDirection: { ...direction },
+    trackPieceVisual: buildTrackPieceVisual(path),
+    upwardVectors,
+  };
+}
+
+function getLoopEndPoint(startPoint: XYZ, direction: XYZ, loopDirection: TurnDirection): XYZ {
+  const loopDirectionAsNumber = loopDirection === 'right' ? 1 : -1;
+
+  const horizontalEndOffset = 1.5;
+  const xDirectionEnd = startPoint.x + direction.x * loopLength;
+  const zDirectionEnd = startPoint.z + direction.z * loopLength;
+
+  const isMovingInDirectionX = direction.z === 0;
+  const isMovingInDirectionZ = direction.x === 0;
+
+  const horizontalOffsetX = Math.sign(-loopDirectionAsNumber * direction.z) * horizontalEndOffset;
+  const horizontalEndX = startPoint.x + horizontalOffsetX;
+  
+  const horizontalOffsetZ = Math.sign(loopDirectionAsNumber * direction.x) * horizontalEndOffset;
+  const horizontalEndZ = startPoint.z + horizontalOffsetZ;
+
+  const endPoint = {
+    x: isMovingInDirectionX ? xDirectionEnd : horizontalEndX,
+    y: startPoint.y,
+    z: isMovingInDirectionZ ? zDirectionEnd : horizontalEndZ,
+  };
+
+  return endPoint;
+}
+
+function getLoopPath(startPoint: XYZ, endPoint: XYZ, direction: XYZ, isForUpwardVectors = false) {
+  const { x, y, z } = startPoint;
+  const isGoingInDirectionX = Math.abs(direction.x) > Math.abs(direction.z);
+  const shouldFlattenX = isForUpwardVectors && !isGoingInDirectionX;
+  const shouldFlattenZ = isForUpwardVectors && isGoingInDirectionX;
+
+  endPoint = {
+    x: shouldFlattenX ? x : endPoint.x,
+    y: endPoint.y,
+    z: shouldFlattenZ ? z : endPoint.z,
+  };
 
   const distanceToEnd = {
     x: endPoint.x - x,
@@ -62,37 +117,5 @@ export function buildLoopPiece(startPoint: XYZ, direction: XYZ, loopDirection: T
   path.add(pathUp);
   path.add(pathDown);
 
-  return {
-    path,
-    startPoint,
-    endPoint,
-    direction,
-    nextDirection: { ...direction },
-    trackPieceVisual: buildTrackPieceVisual(path),
-  };
-}
-
-function getLoopEndPoint(startPoint: XYZ, direction: XYZ, loopDirection: TurnDirection): XYZ {
-  const loopDirectionAsNumber = loopDirection === 'right' ? 1 : -1;
-
-  const horizontalEndOffset = 1.5;
-  const xDirectionEnd = startPoint.x + direction.x * loopLength;
-  const zDirectionEnd = startPoint.z + direction.z * loopLength;
-
-  const isMovingInDirectionX = direction.z === 0;
-  const isMovingInDirectionZ = direction.x === 0;
-
-  const horizontalOffsetX = Math.sign(-loopDirectionAsNumber * direction.z) * horizontalEndOffset;
-  const horizontalEndX = startPoint.x + horizontalOffsetX;
-  
-  const horizontalOffsetZ = Math.sign(loopDirectionAsNumber * direction.x) * horizontalEndOffset;
-  const horizontalEndZ = startPoint.z + horizontalOffsetZ;
-
-  const endPoint = {
-    x: isMovingInDirectionX ? xDirectionEnd : horizontalEndX,
-    y: startPoint.y,
-    z: isMovingInDirectionZ ? zDirectionEnd : horizontalEndZ,
-  };
-
-  return endPoint;
+  return path;
 }

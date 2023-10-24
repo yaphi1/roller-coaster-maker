@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { useFrame, useThree } from "@react-three/fiber";
-import { useContext, useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import Car from './Car';
-import { Path } from "../_scripts/types";
+import { Path, Track } from "../_scripts/types";
 import { CameraContext } from './App';
 import { updateCamera } from '../_scripts/cameraHelpers';
 import { produce } from 'immer';
@@ -14,16 +14,17 @@ const gravityStrength = 0.5;
 const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
 
 export default function Train({
-  path,
+  track,
   carCount = 5,
-  spaceBetweenCarts = 1.2,
+  spaceBetweenCars = 1.2,
   startingProgress = 0,
 }: {
-  path: Path,
+  track: Track,
   carCount?: number,
-  spaceBetweenCarts?: number,
+  spaceBetweenCars?: number,
   startingProgress?: number,
 }) {
+  const { path, upwardVectors } = track;
   const zeroVectors: THREE.Vector3[] = new Array(carCount).fill(new THREE.Vector3());
   const [carPositions, setCarPositions] = useState(zeroVectors);
   const [carRotationTargets, setCarRotationTargets] = useState(zeroVectors);
@@ -95,7 +96,7 @@ export default function Train({
     const updatedProgress = getUpdatedProgress(cleanDelta);
 
     carPositions.forEach((_, carIndex) => {
-      const offset = spaceBetweenCarts * (carIndex - trainMidpoint);
+      const offset = spaceBetweenCars * (carIndex - trainMidpoint);
       updateCar(carIndex, updatedProgress, offset, path);
     });
 
@@ -105,11 +106,16 @@ export default function Train({
   return (
     <>
       {carPositions.map((carPosition, carIndex) => {
+        const offset = spaceBetweenCars * (carIndex - trainMidpoint);
+        const offsetProgress = getOffsetProgress(progress, offset);
+
         return (
           <Car
             key={carIndex}
+            progress={offsetProgress}
             position={carPosition}
             rotationTarget={carRotationTargets[carIndex]}
+            upwardVectors={upwardVectors}
             isFrontCar={carIndex === carCount - 1}
           />
         );

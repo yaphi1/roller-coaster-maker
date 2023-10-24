@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Piece, RampDirection, XYZ } from "../../types";
 import { straightawayLength } from "../trackConstants";
 import { buildTrackPieceVisual } from './buildTrackPieceVisual';
+import { buildUpwardVectors } from './upwardVectorHelpers';
 
 export function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: RampDirection): Piece {
   const { x, y, z } = startPoint;
@@ -43,5 +44,6 @@ export function buildRampPiece(startPoint: XYZ, direction: XYZ, rampDirection: R
     direction,
     nextDirection,
     trackPieceVisual: buildTrackPieceVisual(path),
+    upwardVectors: buildUpwardVectors(path),
   };
 }
