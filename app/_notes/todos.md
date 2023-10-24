@@ -3,7 +3,8 @@
     - [done] compute upward vectors
     - [done] smooth the loops
     - [done] flatten the loop endings
-    - try to get flattened end of loop to match up a bit better width-wise
+    - [done] try to get flattened end of loop to match up a bit better width-wise
+    - [done] fix about middle rail matching on loops
     - make the first-person camera use upward vectors
   - add url param validation
   - undo/redo

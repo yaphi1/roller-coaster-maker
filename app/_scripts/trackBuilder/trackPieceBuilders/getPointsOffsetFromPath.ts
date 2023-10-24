@@ -18,8 +18,9 @@ export function getPointsOffsetFromPath(path: Path, offsetHorizontal = 0, offset
 
   const isVerticalOffsetReversed = frenetFrames[verticalVectors][0].y < 0;
 
+  const { tangents } = frenetFrames;
   const horizontalPerpendiculars = flattenHorizontalPerpendiculars(frenetFrames[horizontalVectors]);
-  const verticalPerpendiculars = frenetFrames[verticalVectors];
+  const verticalPerpendiculars = generateVerticalPerpendiculars(tangents, horizontalPerpendiculars, isBinormalHorizontal);
   const offsetVerticalCorrected = isVerticalOffsetReversed ? -offsetVertical : offsetVertical;
 
   const offsetPoints = points.map((point, i) => {
@@ -45,5 +46,32 @@ function flattenHorizontalPerpendiculars(horizontalPerpendiculars: THREE.Vector3
     const originalLength = perp.length();
     const flattenedVector = new THREE.Vector3(perp.x, 0, perp.z);
     return flattenedVector.setLength(originalLength);
+  });
+}
+
+/* 
+Why generateVerticalPerpendiculars?
+
+The Frenet frames give unreliable vertical
+perpendiculars for our purposes because they
+can warp from side to side depending on the
+curvature.
+
+To get reliable vertical perpendiculars,
+we instead take the cross product of the tangent
+and the flattened horizontal vector at each point.
+*/
+function generateVerticalPerpendiculars(
+  tangents: THREE.Vector3[],
+  horizontalVectors: THREE.Vector3[],
+  isBinormalHorizontal: boolean,
+) {
+  return tangents.map((tangent, i) => {
+    const verticalPerpendicular = new THREE.Vector3();
+    verticalPerpendicular.crossVectors(tangent, horizontalVectors[i]);
+    if (isBinormalHorizontal) {
+      verticalPerpendicular.y = -verticalPerpendicular.y;
+    }
+    return verticalPerpendicular;
   });
 }
