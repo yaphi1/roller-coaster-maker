@@ -9,7 +9,7 @@ import startingTrackPieces from '../_premadeTracks/000_starter';
 import { buildTrack } from '../_scripts/trackBuilder/buildTrack';
 import { CameraType, CoasterColors, Track } from '../_scripts/types';
 import { defaultCoasterColors } from '../_scripts/defaults';
-import { decodeTrack, encodeTrack, stripHexHashes, updateHash } from '../_scripts/urlHashUtils';
+import { decodeTrack, encodeTrack, produceValidColor, produceValidTrackPieceCodes, stripHexHashes, updateHash } from '../_scripts/urlHashUtils';
 import { produce } from 'immer';
 
 const cameraSettings = {
@@ -63,13 +63,13 @@ export default function App() {
 
         setCoasterColors(produce((draft) => {
           draft[0] = {
-            train: '#' + params.get('train') ?? 'ffffff',
-            rails: '#' + params.get('rails') ?? 'ffffff',
-            scaffolding: '#' + params.get('scaffolding') ?? 'ffffff',
+            train: '#' + produceValidColor(params.get('train')),
+            rails: '#' + produceValidColor(params.get('rails')),
+            scaffolding: '#' + produceValidColor(params.get('scaffolding')),
           };
         }));
 
-        const encodedPieces = params.get('p') ?? 'sss'; // default three straight pieces just in case
+        const encodedPieces = produceValidTrackPieceCodes(params.get('p'));
         const decodedPieces = decodeTrack(encodedPieces);
         setTrackPieces(produce((draft) => {
           return decodedPieces

@@ -41,3 +41,19 @@ export function decodeTrack(encodedString: string) {
 export const updateHash = debounce((paramString: string) => {
   window.location.hash = paramString;
 }, 500);
+
+export const produceValidColor = (color: string | null) => {
+  const defaultResult = 'ffffff';
+  if (!color) { return defaultResult; }
+  const validHexPattern = (/^[a-f0-9]{6}$/i);
+  const isValidHex = (validHexPattern).test(color);
+  return isValidHex ? color : defaultResult;
+};
+
+export const produceValidTrackPieceCodes = (encodedPieces: string | null) => {
+  const defaultResult = 'sss';
+  if (!encodedPieces) { return defaultResult; }
+  const invalidCodes = (/[^srludop]/ig);
+  const result = encodedPieces.replace(invalidCodes, '');
+  return result.length >= 3 ? result : defaultResult;
+};
