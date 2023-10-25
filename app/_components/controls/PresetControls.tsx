@@ -3,6 +3,8 @@ import { Dispatch, SetStateAction } from "react";
 import starter from '@/app/_premadeTracks/000_starter';
 import twoHills from '@/app/_premadeTracks/001_two_hills';
 import bigDrop from '@/app/_premadeTracks/002_big_drop';
+import loops from '@/app/_premadeTracks/003_loops';
+import { decodeTrack } from "@/app/_scripts/urlHashUtils";
 
 export default function PresetControls({ setTrackPieces }:
   { setTrackPieces: Dispatch<SetStateAction<PieceType[]>> }
@@ -15,23 +17,30 @@ export default function PresetControls({ setTrackPieces }:
       <div className="flex gap-1">
         <button
           className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => { setTrackPieces(starter) }}
+          onClick={() => { setTrackPieces(decodeTrack(starter)) }}
         >
           Starter
         </button>
         
         <button
           className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => { setTrackPieces(twoHills) }}
+          onClick={() => { setTrackPieces(decodeTrack(twoHills)) }}
         >
-          Track 1
+          Hills
         </button>
         
         <button
           className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
-          onClick={() => { setTrackPieces(bigDrop) }}
+          onClick={() => { setTrackPieces(decodeTrack(bigDrop)) }}
         >
-          Track 2
+          Drop
+        </button>
+        
+        <button
+          className="bg-slate-200 shadow-md rounded-md p-2 disabled:text-slate-400 hover:bg-yellow-200 disabled:bg-slate-200/50"
+          onClick={() => { setTrackPieces(decodeTrack(loops)) }}
+        >
+          Loops
         </button>
       </div>
     </div>

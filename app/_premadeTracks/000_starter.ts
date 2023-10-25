@@ -1,10 +1,3 @@
-import { PieceType } from "../_scripts/types";
-
-const track: PieceType[] = [
-  'straight',
-  'straight',
-  'straight',
-  'straight',
-];
+const track = 'ssss';
 
 export default track;

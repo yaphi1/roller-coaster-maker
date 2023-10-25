@@ -44,7 +44,7 @@ export default function App() {
   const isFirstRender = useRef(true);
 
   // TODO: change later to accommodate multiple tracks
-  const [trackPieces, setTrackPieces] = useState(startingTrackPieces);
+  const [trackPieces, setTrackPieces] = useState(decodeTrack(startingTrackPieces));
   const [cameraType, setCameraType] = useState<CameraType>('orbital');
   const [coasterColors, setCoasterColors] = useState([ defaultCoasterColors ]);
   const [currentModal, setCurrentModal] = useState<string | null>(null);
