@@ -16,19 +16,20 @@ const horizontalDrag = stopForDebugging ? 0.22 : 0.02;
 export default function Train({
   track,
   carCount = 5,
-  spaceBetweenCars = 1.2,
+  spaceBetweenCarMidpoints = 1.2,
   startingProgress = 0,
 }: {
   track: Track,
   carCount?: number,
-  spaceBetweenCars?: number,
+  spaceBetweenCarMidpoints?: number,
   startingProgress?: number,
 }) {
+  const offsetStartingProgress = getOffsetStartingProgress(startingProgress, carCount, spaceBetweenCarMidpoints, track.path);
   const { path, upwardVectors } = track;
   const zeroVectors: THREE.Vector3[] = new Array(carCount).fill(new THREE.Vector3());
   const [carPositions, setCarPositions] = useState(zeroVectors);
   const [carRotationTargets, setCarRotationTargets] = useState(zeroVectors);
-  const [progress, setProgress] = useState(startingProgress);
+  const [progress, setProgress] = useState(offsetStartingProgress);
   const [speed, setSpeed] = useState(10);
 
   const camera = useThree().camera;
@@ -96,17 +97,18 @@ export default function Train({
     const updatedProgress = getUpdatedProgress(cleanDelta);
 
     carPositions.forEach((_, carIndex) => {
-      const offset = spaceBetweenCars * (carIndex - trainMidpoint);
+      const offset = spaceBetweenCarMidpoints * (carIndex - trainMidpoint);
       updateCar(carIndex, updatedProgress, offset, path);
     });
 
     setProgress(updatedProgress);
   });
 
-  return (
+  const arePositionsPrepping = carPositions === zeroVectors;
+  return arePositionsPrepping ? (<></>) : (
     <>
       {carPositions.map((carPosition, carIndex) => {
-        const offset = spaceBetweenCars * (carIndex - trainMidpoint);
+        const offset = spaceBetweenCarMidpoints * (carIndex - trainMidpoint);
         const offsetProgress = getOffsetProgress(progress, offset);
 
         return (
@@ -122,4 +124,20 @@ export default function Train({
       })}
     </>
   );
+}
+
+function getOffsetStartingProgress(
+  startingProgress: number,
+  carCount: number,
+  spaceBetweenCarMidpoints: number,
+  path: Path,
+) {
+  const offset = spaceBetweenCarMidpoints * carCount / 2;
+  const trackLength = path.getLength();
+  const startingPosition = startingProgress * trackLength;
+  const carLengthAllowance = 0.5;
+  const adjustedPosition = startingPosition + offset + carLengthAllowance;
+  const offsetStartingProgress = adjustedPosition / trackLength;
+
+  return offsetStartingProgress;
 }
