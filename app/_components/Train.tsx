@@ -36,53 +36,18 @@ export default function Train({
   const cameraContext = useContext(CameraContext);
   updateCamera(camera, cameraContext?.cameraType, path, progress, upwardVectors);
 
-  const trainMidpoint = (carCount / 2) - 0.5;
-  const trackLength = useMemo(() => {
-    return path.getLength();
-  }, [path]);
-
-  function getUpdatedProgress(delta: number) {
-    const distanceTraveledThisIncrement = speed * (1 / trackLength) * delta;
-    const updatedProgress = (progress + distanceTraveledThisIncrement) % 1;
-    return updatedProgress;
-  }
-
-  function getOffsetProgress(updatedProgress: number, offset: number) {
-    const maxProgress = 1; // add full amount to avoid problems with js modulus and negative numbers
-    const offsetAsFractionOfWholeTrack = offset / trackLength;
-    return (updatedProgress + offsetAsFractionOfWholeTrack + maxProgress) % 1;
-  }
-
-  function updatePosition(carIndex: number, updatedProgress: number, offset = 0) {
-    const offsetProgress = getOffsetProgress(updatedProgress, offset);
-    const newPosition = path.getPointAt(offsetProgress);
-    setCarPositions(produce((draft) => {
-      draft[carIndex] = newPosition;
-    }));
-  }
-  
-  function updateRotationTarget(carIndex: number, updatedProgress: number, offset = 0, path: Path) {
-    const offsetProgress = getOffsetProgress(updatedProgress, offset);
-    const tangent = path.getTangentAt(offsetProgress);
-    const cartCenter = carPositions[carIndex].clone();
-    const rotationTarget = cartCenter.add(tangent);
-
-    setCarRotationTargets(produce((draft) => {
-      draft[carIndex] = rotationTarget;
-    }));
-  }
-
-  function updateSpeed(updatedProgress: number, path: Path) {
-    const verticalChange = path.getTangentAt(updatedProgress).y;
-    const verticalDrag = verticalChange * gravityStrength;
-    const newSpeed = Math.max(speed - verticalDrag - horizontalDrag, minSpeed);
-    setSpeed(newSpeed);
-  }
+  const [trackLength, trainMidpoint] = useMemo(() => {
+    return [path.getLength(), (carCount / 2) - 0.5];
+  }, [path, carCount]);
 
   function updateCar(carIndex: number, updatedProgress: number, offset: number, path: Path) {
-    updatePosition(carIndex, updatedProgress, offset);
-    updateRotationTarget(carIndex, updatedProgress, offset, path);
-    updateSpeed(updatedProgress, path);
+    const newPosition = getNextPosition(path, updatedProgress, offset);
+    const rotationTarget = getNextRotationTarget(carIndex, updatedProgress, offset, path, carPositions);
+    const newSpeed = getNewSpeed(speed, updatedProgress, path);
+
+    setCarPositions(produce((draft) => { draft[carIndex] = newPosition; }));
+    setCarRotationTargets(produce((draft) => { draft[carIndex] = rotationTarget; }));
+    setSpeed(newSpeed);
   }
 
   useFrame((state, delta) => {
@@ -94,7 +59,7 @@ export default function Train({
     //   For this reason, we'll hardcode an approximate delta of 0.033 to pick up roughly where we left off.
     //   0.033 was chosen based to approximate a lower limit of 30fps
     const cleanDelta = Math.min(delta, 0.033);
-    const updatedProgress = getUpdatedProgress(cleanDelta);
+    const updatedProgress = getUpdatedProgress(cleanDelta, progress, speed, trackLength);
 
     carPositions.forEach((_, carIndex) => {
       const offset = spaceBetweenCarMidpoints * (carIndex - trainMidpoint);
@@ -109,7 +74,7 @@ export default function Train({
     <>
       {carPositions.map((carPosition, carIndex) => {
         const offset = spaceBetweenCarMidpoints * (carIndex - trainMidpoint);
-        const offsetProgress = getOffsetProgress(progress, offset);
+        const offsetProgress = getOffsetProgress(path, progress, offset);
 
         return (
           <Car
@@ -140,4 +105,38 @@ function getOffsetStartingProgress(
   const offsetStartingProgress = adjustedPosition / trackLength;
 
   return offsetStartingProgress;
+}
+
+function getNextPosition(path: Path, updatedProgress: number, offset = 0) {
+  const offsetProgress = getOffsetProgress(path, updatedProgress, offset);
+  const newPosition = path.getPointAt(offsetProgress);
+  return newPosition;
+}
+
+function getOffsetProgress(path: Path, updatedProgress: number, offset: number) {
+  const trackLength = path.getLength();
+  const maxProgress = 1; // add full amount to avoid problems with js modulus and negative numbers
+  const offsetAsFractionOfWholeTrack = offset / trackLength;
+  return (updatedProgress + offsetAsFractionOfWholeTrack + maxProgress) % 1;
+}
+
+function getNextRotationTarget(carIndex: number, updatedProgress: number, offset = 0, path: Path, carPositions: THREE.Vector3[]) {
+  const offsetProgress = getOffsetProgress(path, updatedProgress, offset);
+  const tangent = path.getTangentAt(offsetProgress);
+  const cartCenter = carPositions[carIndex].clone();
+  const rotationTarget = cartCenter.add(tangent);
+  return rotationTarget;
+}
+
+function getNewSpeed(currentSpeed: number, updatedProgress: number, path: Path) {
+  const verticalChange = path.getTangentAt(updatedProgress).y;
+  const verticalDrag = verticalChange * gravityStrength;
+  const newSpeed = Math.max(currentSpeed - verticalDrag - horizontalDrag, minSpeed);
+  return newSpeed;
+}
+
+function getUpdatedProgress(delta: number, progress: number, speed: number, trackLength: number) {
+  const distanceTraveledThisIncrement = speed * (1 / trackLength) * delta;
+  const updatedProgress = (progress + distanceTraveledThisIncrement) % 1;
+  return updatedProgress;
 }
