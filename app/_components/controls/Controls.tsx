@@ -1,10 +1,11 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { PieceType, Track } from "../../_scripts/types";
 import CameraControls from "./CameraControls";
 import TrackEditorControls from "./TrackEditorControls";
 import PresetControls from "./PresetControls";
 import ColorControls from "./ColorControls";
 import PlaybackControls from "./PlaybackControls";
+import GeneralControls from "./GeneralControls";
 
 export default function Controls(
   { trackPieces, setTrackPieces, builtTracks }:
@@ -14,14 +15,19 @@ export default function Controls(
     builtTracks: Track[],
   }
 ) {
+  const [isUiVisible, setIsUiVisible] = useState(true);
+
   return (
     <>
-      <TrackEditorControls trackPieces={trackPieces} setTrackPieces={setTrackPieces} builtTracks={builtTracks} />
-      <PresetControls setTrackPieces={setTrackPieces} />
-      <ColorControls />
+      {isUiVisible && <ColorControls />}
+      <div className="fixed z-10 right-0 top-0 flex">
+        {isUiVisible && <PresetControls setTrackPieces={setTrackPieces} />}
+        <GeneralControls isUiVisible={isUiVisible} setIsUiVisible={setIsUiVisible} />
+      </div>
+      {isUiVisible && <TrackEditorControls trackPieces={trackPieces} setTrackPieces={setTrackPieces} builtTracks={builtTracks} />}
       <div className="fixed z-10 right-0 bottom-0 flex">
-        <PlaybackControls />
-        <CameraControls />
+        {isUiVisible && <PlaybackControls />}
+        {isUiVisible && <CameraControls />}
       </div>
     </>
   );

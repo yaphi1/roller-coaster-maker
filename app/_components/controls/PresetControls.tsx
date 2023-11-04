@@ -10,7 +10,7 @@ export default function PresetControls({ setTrackPieces }:
   { setTrackPieces: Dispatch<SetStateAction<PieceType[]>> }
 ) {
   return (
-    <div className="fixed z-10 right-0 top-0 bg-white/50 rounded-md p-2 m-2 text-slate-700">
+    <div className="bg-white/50 rounded-md p-2 m-2 text-slate-700">
       <div className="font-bold mb-1">
         Presets
       </div>
